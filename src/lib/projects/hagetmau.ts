@@ -342,9 +342,17 @@ export function buildHagetmauProject(): Project {
     existing: true,
     name,
   });
-  columns.push(col(2.9, 5.38, 0.2, 0.2, 'Poteau existant'));
-  columns.push(col(0.42, 13.38, 0.2, 0.2, 'Poteau existant'));
-  columns.push(col(7.7, 2.01, 0.5, 0.2, 'Poteau existant (réserve)'));
+  // Les six éléments de structure relevés sur le plan manuscrit. Les distances
+  // sont mesurées le long du bâtiment depuis le pignon d'entrée (y = 23,00) et
+  // en travers depuis le mur gauche. Les cotes écrites au plan (538 / 290,
+  // 1000, 160 + 50) priment sur les mesures faites sur le dessin.
+  const alongFront = (d: number) => YF - d;
+  columns.push(col(0.3, alongFront(13.31), 0.2, 0.2, 'Poteau P1 — 13,31 m, contre mur gauche'));
+  columns.push(col(0.3, alongFront(16.0), 0.2, 0.2, 'Poteau P2 — 16,00 m, contre mur gauche'));
+  columns.push(col(XL + 2.9, alongFront(5.38), 0.2, 0.2, 'Poteau P3 — 5,38 m / 2,90 m (coté au plan)'));
+  columns.push(col(XL + 4.95, alongFront(16.0), 0.2, 0.2, 'Poteau P4 — 16,00 m / 4,95 m'));
+  columns.push(col(XR - 0.1, alongFront(1.85), 0.2, 0.5, 'Poteau P5 — 1,85 m, contre mur droit (50 × 20)'));
+  columns.push(col(XR - 0.85, alongFront(10.0), 0.7, 1.1, 'Gaine technique — 10,00 m, 110 × 70'));
 
   // ------------------------------------------------------------- la réserve
   zones.push(zone('reserve', XL, YB, XR - XL, RESERVE_DEPTH));
@@ -365,17 +373,20 @@ export function buildHagetmauProject(): Project {
   let y = SALES_TOP;
   y = runY(items, MULTIFREEZE, XR, 'right', y, 2); // 6 portes surgelés
   zones.push(zone('surgeles', XR - 0.9, SALES_TOP, 0.9, y - SALES_TOP));
+  // Le linéaire frais est interrompu par la gaine technique relevée à 10,00 m
+  // du pignon (y ≈ 13,00) : il reprend au-delà.
   const fraisTop = y + 0.32;
-  y = runY(items, EIS_162, XR, 'right', fraisTop, 2); // repère 1A
+  y = runY(items, EIS_162, XR, 'right', fraisTop, 1); // repère 1A (1er meuble)
+  y = runY(items, EIS_162, XR, 'right', 13.7, 1); // repère 1A (2e meuble), après la gaine
   y = runY(items, EIS_112, XR, 'right', y, 1); // repère 1B
   zones.push(zone('frais', XR - 0.9, fraisTop, 0.9, y - fraisTop));
-  y = runY(items, MURAL, XR, 'right', y + 0.3, 5); // mural 5,03 ml
+  y = runY(items, MURAL, XR, 'right', y + 0.3, 3); // mural 3,03 ml, s'arrête avant le poteau P5
   // La presse se pose côté gauche en façade, face à l'entrée.
   items.push(put(PRESSE, XL + PRESSE.d / 2, YF - 1.0, 90));
 
   // --- mur gauche : mural 7,03, poteau, mural 3,03, frais rep.2, mural 1,03
   let yl = SALES_TOP + LOCKER.d;
-  yl = runY(items, MURAL, XL, 'left', yl, 7); // 7,03 ml
+  yl = runY(items, MURAL, XL, 'left', 10.1, 7); // 7,03 ml, après les poteaux P1 et P2
   yl = runY(items, MURAL, XL, 'left', 13.9, 3); // 3,03 ml, après le poteau
   const rep2Top = yl + 0.3;
   yl = runY(items, EIS_112, XL, 'left', rep2Top, 1); // repère 2
@@ -396,14 +407,15 @@ export function buildHagetmauProject(): Project {
     return cy + TG_LEN;
   };
 
-  const highTop = 6.68;
+  const highTop = 7.35; // dégage le poteau P4 (y = 7,00)
   const highEnd = gondolaRun(RUN_A, highTop, GONDOLE_H, TG_H, 4);
   gondolaRun(RUN_B, highTop, GONDOLE_H, TG_H, 4);
   zones.push(zone('epicerie', RUN_A - 0.5, highTop, RUN_B - RUN_A + 1, highEnd - highTop));
 
   const lowTop = highEnd + 1.6; // allée transversale
-  const lowEnd = gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 3);
-  gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 2);
+  // Le poteau P3 (y = 17,62) traverse l'axe de la file A : les gondoles basses
+  // sont reportées sur la file B, seule dégagée.
+  const lowEnd = gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 3);
 
   // --- avant-magasin
   // L'îlot fruits et légumes occupe le centre de l'entrée de magasin : c'est
@@ -414,7 +426,7 @@ export function buildHagetmauProject(): Project {
 
   // Une seule caisse bi-optique, conformément au devis TILT, adossée au mur
   // droit face à la sortie. Le poste de l'hôte de caisse reste dégagé.
-  items.push(put(CAISSE, XR - CAISSE.d / 2, 21.3, 90));
+  items.push(put(CAISSE, XR - 0.45 - CAISSE.d / 2, 21.3, 90)); // dégage le poteau P5
   zones.push(zone('caisse', XR - 2.6, YF - 3.0, 2.6, 3.0));
 
   items.push(
