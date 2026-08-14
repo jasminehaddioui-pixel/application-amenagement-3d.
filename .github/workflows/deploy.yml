@@ -38,12 +38,13 @@ jobs:
       - name: Vérification TypeScript et build de production
         run: npm run build
 
+      # Prérequis, à faire une seule fois : dans Settings > Pages du dépôt,
+      # choisir « GitHub Actions » comme source. Le jeton du workflow n'a pas
+      # le droit d'activer Pages lui-même. À noter : sur un dépôt privé, Pages
+      # nécessite un abonnement GitHub payant ; sinon il faut rendre le dépôt
+      # public, ou déployer sur Netlify / Vercel qui acceptent les dépôts privés.
       - name: Préparation de l'artefact Pages
         uses: actions/configure-pages@v5
-        with:
-          # Active GitHub Pages automatiquement si ce n'est pas déjà fait,
-          # pour éviter d'avoir à le configurer à la main dans les réglages.
-          enablement: true
 
       - name: Envoi de l'artefact
         uses: actions/upload-pages-artifact@v3

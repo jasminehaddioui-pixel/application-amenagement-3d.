@@ -21,6 +21,25 @@ npm run preview    # sert le build de production sur http://localhost:4173
 
 Prérequis : Node.js 18 ou supérieur. Le navigateur doit supporter WebGL pour la vue 3D.
 
+## Mise en ligne
+
+Le dépôt contient un workflow GitHub Actions (`.github/workflows/deploy.yml`) qui
+vérifie les types, construit le bundle et le publie sur GitHub Pages à chaque push.
+
+Une configuration manuelle est nécessaire **une seule fois** : dans
+**Settings → Pages → Build and deployment**, choisir **GitHub Actions** comme source.
+Le jeton du workflow n'a pas le droit de le faire à votre place. Relancez ensuite le
+workflow depuis l'onglet Actions.
+
+Attention : GitHub Pages sur un dépôt **privé** nécessite un abonnement GitHub payant.
+Sur le plan gratuit, il faut rendre le dépôt public. Publier l'application n'expose
+aucun de vos plans : l'application n'a pas de serveur, chaque projet reste dans le
+navigateur de la personne qui l'utilise.
+
+Alternative si le dépôt doit rester privé : Netlify ou Vercel acceptent les dépôts
+privés sur leur offre gratuite. Il suffit d'y connecter le dépôt avec la commande de
+build `npm run build` et le dossier de publication `dist`.
+
 ---
 
 ## Fonctionnalités
