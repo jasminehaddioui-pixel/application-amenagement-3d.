@@ -56,6 +56,8 @@ export interface Opening {
 export interface Column {
   id: string;
   kind: 'column';
+  /** Libelle libre, utile pour distinguer les poteaux releves sur place */
+  name?: string;
   shape: 'rect' | 'round';
   x: number;
   y: number;
@@ -103,6 +105,8 @@ export interface Item {
   /** Identifiant du modele dans le catalogue */
   catalogId: string;
   name: string;
+  /** Reference fabricant / ligne de devis, quand elle est connue */
+  reference?: string;
   category: ItemCategory;
   /** Centre de l'objet */
   x: number;

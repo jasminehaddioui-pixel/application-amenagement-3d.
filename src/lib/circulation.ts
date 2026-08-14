@@ -29,11 +29,17 @@ export interface CirculationReport {
   minWidth: number | null;
 }
 
-/** Distance minimale d'un point a un polygone (0 si le point est dedans). */
-function pointPolyDistance(p: Vec2, poly: Vec2[]): { d: number; point: Vec2 } {
-  if (pointInPolygon(p, poly)) return { d: 0, point: p };
+/**
+ * Distance minimale d'un point a un polygone (0 si le point est dedans).
+ * `onEdge` indique que le point le plus proche tombe dans le corps d'une arete
+ * et non sur un sommet : c'est ce qui distingue deux faces qui se font face
+ * d'un simple angle entre deux meubles perpendiculaires.
+ */
+function pointPolyDistance(p: Vec2, poly: Vec2[]): { d: number; point: Vec2; onEdge: boolean } {
+  if (pointInPolygon(p, poly)) return { d: 0, point: p, onEdge: true };
   let best = Infinity;
   let bestPt = poly[0] ?? p;
+  let onEdge = false;
   for (let i = 0; i < poly.length; i++) {
     const a = poly[i];
     const b = poly[(i + 1) % poly.length];
@@ -41,9 +47,10 @@ function pointPolyDistance(p: Vec2, poly: Vec2[]): { d: number; point: Vec2 } {
     if (pr.distance < best) {
       best = pr.distance;
       bestPt = pr.point;
+      onEdge = pr.t > 0.001 && pr.t < 0.999;
     }
   }
-  return { d: best, point: bestPt };
+  return { d: best, point: bestPt, onEdge };
 }
 
 /**
@@ -51,16 +58,21 @@ function pointPolyDistance(p: Vec2, poly: Vec2[]): { d: number; point: Vec2 } {
  * On teste tous les couples sommet/arete dans les deux sens : suffisant et exact
  * pour des polygones convexes disjoints.
  */
-export function polyDistance(pa: Vec2[], pb: Vec2[]): { d: number; from: Vec2; to: Vec2 } {
+export function polyDistance(
+  pa: Vec2[],
+  pb: Vec2[],
+): { d: number; from: Vec2; to: Vec2; faceToFace: boolean } {
   let best = Infinity;
   let from: Vec2 = pa[0];
   let to: Vec2 = pb[0];
+  let faceToFace = false;
   for (const p of pa) {
     const r = pointPolyDistance(p, pb);
     if (r.d < best) {
       best = r.d;
       from = p;
       to = r.point;
+      faceToFace = r.onEdge;
     }
   }
   for (const p of pb) {
@@ -69,9 +81,10 @@ export function polyDistance(pa: Vec2[], pb: Vec2[]): { d: number; from: Vec2; t
       best = r.d;
       from = r.point;
       to = p;
+      faceToFace = r.onEdge;
     }
   }
-  return { d: best, from, to };
+  return { d: best, from, to, faceToFace };
 }
 
 /** Les objets bas (paniers, palettes, TPE...) ne definissent pas une allee. */
@@ -79,8 +92,15 @@ const IGNORED_FOR_AISLES = new Set(['terminal-paiement', 'panier', 'chariot']);
 
 export function buildObstacles(floor: Floor, includeWalls = true): Obstacle[] {
   const obs: Obstacle[] = [];
+
+  // La réserve n'est pas accessible au public : ses allées de service, plus
+  // étroites, ne relèvent pas de la circulation clients.
+  const reserves = floor.zones.filter((z) => z.category === 'reserve' && z.points.length >= 3);
+  const inReserve = (p: Vec2) => reserves.some((z) => pointInPolygon(p, z.points));
+
   for (const it of floor.items) {
     if (IGNORED_FOR_AISLES.has(it.catalogId)) continue;
+    if (inReserve({ x: it.x, y: it.y })) continue;
     obs.push({ id: it.id, label: it.name, poly: itemCorners(it), type: 'item' });
   }
   if (includeWalls) {
@@ -109,6 +129,14 @@ function segmentIsClear(from: Vec2, to: Vec2, obstacles: Obstacle[], skipA: stri
 }
 
 /**
+ * En dessous de cette largeur, l'espace entre deux meubles n'est pas un passage
+ * mais un simple jeu de pose : un meuble presque contre un mur, deux gondoles
+ * accolees. Les signaler comme « allees trop etroites » noierait les vrais
+ * problemes sous des dizaines de faux positifs.
+ */
+export const MIN_WALKABLE_GAP = 0.6;
+
+/**
  * Analyse les circulations clients.
  * @param maxGap largeur au dela de laquelle on ne considere plus qu'il s'agit d'une allee
  */
@@ -123,9 +151,12 @@ export function analyseCirculation(floor: Floor, minWidth: number, maxGap = 4): 
       // Deux murs entre eux ne definissent pas une allee interessante a mesurer
       if (a.type === 'wall' && b.type === 'wall') continue;
 
-      const { d, from, to } = polyDistance(a.poly, b.poly);
-      if (d <= 0.001) continue; // en contact ou en collision
+      const { d, from, to, faceToFace } = polyDistance(a.poly, b.poly);
+      if (d < MIN_WALKABLE_GAP) continue; // jeu de pose, pas une circulation
       if (d > maxGap) continue;
+      // Deux meubles perpendiculaires qui se rejoignent en angle ne forment pas
+      // une allee : la diagonale mesuree entre leurs coins n'est pas un passage.
+      if (!faceToFace) continue;
       if (!segmentIsClear(from, to, obstacles, a.id, b.id)) continue;
 
       gaps.push({
@@ -135,7 +166,9 @@ export function analyseCirculation(floor: Floor, minWidth: number, maxGap = 4): 
         from,
         to,
         width: d,
-        narrow: d < minWidth,
+        // Tolérance de 5 mm : une allée calculée à 1,79999 m répond bien à une
+        // exigence de 1,80 m, et personne ne pose un meuble au millimètre.
+        narrow: d < minWidth - 0.005,
       });
     }
   }

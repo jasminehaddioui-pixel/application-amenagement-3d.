@@ -28,6 +28,8 @@ import {
   uid,
   wallLength,
 } from '../lib/geometry';
+import type { GeneratedLayout } from '../lib/autoLayout';
+import { buildHagetmauProject } from '../lib/projects/hagetmau';
 import {
   createProject,
   loadProject,
@@ -104,6 +106,9 @@ interface EditorState {
   pendingCatalogId: string | null;
   /** Calibration d'echelle en cours : longueur reelle a saisir */
   calibration: { a: Vec2; b: Vec2 } | null;
+  /** Ouverture du formulaire d'implantation automatique */
+  autoLayoutOpen: boolean;
+  setAutoLayoutOpen: (v: boolean) => void;
 
   // ---- historique
   commit: (label: string, fn: (p: Project) => void) => void;
@@ -160,8 +165,12 @@ interface EditorState {
   updateSettings: (patch: Partial<ProjectSettings>) => void;
   updateExisting: (patch: Partial<ExistingOptions>) => void;
 
+  // ---- implantation automatique
+  applyGeneratedLayout: (layout: GeneratedLayout, replace: boolean) => void;
+
   // ---- projets
   newProject: (name?: string) => void;
+  loadHagetmau: () => void;
   openProject: (id: string) => void;
   loadProjectObject: (p: Project) => void;
   saveNow: () => void;
@@ -176,7 +185,9 @@ function initialProject(): Project {
     const p = loadProject(id);
     if (p) return p;
   }
-  return createProject('Projet supérette');
+  // Premier lancement : on ouvre directement le magasin de Hagetmau, monté a
+  // partir des relevés et des devis, plutôt qu'un plan vide.
+  return buildHagetmauProject();
 }
 
 /** Retrouve un element du plan par son identifiant. */
@@ -204,6 +215,8 @@ export const useEditor = create<EditorState>((set, get) => ({
   notices: [],
   pendingCatalogId: null,
   calibration: null,
+  autoLayoutOpen: false,
+  setAutoLayoutOpen: (v) => set({ autoLayoutOpen: v }),
 
   // ------------------------------------------------------------------ history
   commit: (_label, fn) => {
@@ -763,7 +776,40 @@ export const useEditor = create<EditorState>((set, get) => ({
     });
   },
 
+  // --------------------------------------------------- implantation automatique
+  applyGeneratedLayout: (layout, replace) => {
+    get().commit('Générer une implantation', (p) => {
+      if (replace) {
+        p.floor.walls = [];
+        p.floor.openings = [];
+        p.floor.columns = [];
+        p.floor.zones = [];
+        p.floor.items = [];
+        p.floor.dimensions = [];
+      }
+      p.floor.walls.push(...layout.walls);
+      p.floor.openings.push(...layout.openings);
+      // Les zones passent en premier plan de fond, sous les murs deja poses.
+      p.floor.zones.push(...layout.zones);
+      p.floor.items.push(...layout.items);
+    });
+    set({ selection: [] });
+    const n = layout.items.length;
+    get().notify(
+      `Implantation générée : ${n} meuble${n > 1 ? 's' : ''}, ${layout.zones.length} zones.`,
+      'success',
+    );
+    layout.warnings.forEach((w) => get().notify(w, 'error'));
+  },
+
   // ---------------------------------------------------------------- projects
+  loadHagetmau: () => {
+    const p = buildHagetmauProject();
+    saveProject(p);
+    set({ project: p, selection: [], past: [], future: [], dirty: false, draft: null, tool: 'select' });
+    get().notify('Projet Panier Sympa — Hagetmau chargé.', 'success');
+  },
+
   newProject: (name) => {
     const p = createProject(name ?? 'Nouveau projet');
     saveProject(p);

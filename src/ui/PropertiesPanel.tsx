@@ -62,6 +62,12 @@ export default function PropertiesPanel() {
               Objet <span className="badge">{CATEGORY_LABELS[el.category as ItemCategory]}</span>
             </h3>
             <TextField label="Nom de l'objet" value={el.name} onCommit={(v) => st.updateItem(el.id, { name: v })} />
+            <TextField
+              label="Référence (devis, fabricant)"
+              value={el.reference ?? ''}
+              placeholder="ex. EPTA 260710-6140B rep.1A"
+              onCommit={(v) => st.updateItem(el.id, { reference: v || undefined })}
+            />
             <SelectField
               label="Catégorie"
               value={el.category}
@@ -593,8 +599,28 @@ function PlanSummary() {
     .filter((i) => i.category === 'rayonnage' || i.category === 'froid')
     .reduce((s, i) => s + i.width, 0);
 
+  const empty = floor.walls.length + floor.items.length + floor.zones.length === 0;
+
   return (
     <div className="panel-body">
+      {empty && (
+        <div className="section">
+          <h3 className="section-title">Démarrer</h3>
+          <p className="hint" style={{ marginTop: 0, marginBottom: 8 }}>
+            Le plan est vide. Le plus rapide est de partir d'une implantation complète, puis de
+            l'ajuster.
+          </p>
+          <button
+            type="button"
+            className="btn primary"
+            style={{ width: '100%' }}
+            onClick={() => useEditor.getState().setAutoLayoutOpen(true)}
+          >
+            Générer un magasin complet
+          </button>
+        </div>
+      )}
+
       <div className="section">
         <h3 className="section-title">Synthèse du plan</h3>
         <div className="stats">

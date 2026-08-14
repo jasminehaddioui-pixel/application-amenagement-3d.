@@ -5,6 +5,7 @@ import LeftPanel from './ui/LeftPanel';
 import PropertiesPanel from './ui/PropertiesPanel';
 import ProjectsDialog from './ui/ProjectsDialog';
 import ScaleDialog from './ui/ScaleDialog';
+import AutoLayoutDialog from './ui/AutoLayoutDialog';
 import Canvas2D from './editor2d/Canvas2D';
 import Scene3D, { download3DImage } from './view3d/Scene3D';
 import { exportPlanPDF, exportPlanPNG, printPlan } from './lib/exporters';
@@ -21,6 +22,7 @@ export default function App() {
   const notices = useEditor((s) => s.notices);
   const selection = useEditor((s) => s.selection);
   const pendingCatalogId = useEditor((s) => s.pendingCatalogId);
+  const autoLayoutOpen = useEditor((s) => s.autoLayoutOpen);
   const store = useEditor;
 
   const isMobile = useIsMobile();
@@ -344,6 +346,7 @@ export default function App() {
       )}
 
       {showProjects && <ProjectsDialog onClose={() => setShowProjects(false)} />}
+      {autoLayoutOpen && <AutoLayoutDialog onClose={() => store.getState().setAutoLayoutOpen(false)} />}
       <ScaleDialog />
 
       <div className="notices">

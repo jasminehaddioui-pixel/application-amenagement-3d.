@@ -195,6 +195,32 @@ plan :
 
 ---
 
+## Projet de référence : Panier Sympa — Hagetmau
+
+L'application s'ouvre directement sur le magasin de **Hagetmau (40700)**, monté à
+l'échelle réelle à partir des documents du projet. Il est rechargeable à tout moment
+par `Projets` → `Charger « Panier Sympa — Hagetmau »`.
+
+Sources utilisées, par ordre d'autorité :
+
+| Document | Ce qui en est repris |
+|---|---|
+| Relevé manuscrit du local | coque 23,20 × 8,20 m hors tout, murs 20 cm, 3 poteaux existants, porte de service 1,50 m |
+| Plan d'implantation `hagetmau_2` | 18,77 m de vente, lockers Amazon, presse, entrée en pignon, principe de zonage |
+| Devis RAY-ORG n° DE2026-133 | muraux h. 2200 (7,03 + 3,03 + 6,03 + 1,03 ml), 8 modules centraux double face, têtes de gondole, gondoles basses h. 1500 |
+| Trame devis TILT | caisse bi-optique L 1400, îlot fruits et légumes H 155 de 2 ml |
+| Dossier technique EPTA n° 260710-6140B | cotes hors tout exactes du froid : EIS 162 HP (1875 × 786 × 2035), EIS 112 HP (1250 × 786 × 2032), Multifreeze Plus Efficia 3P (2100 × 763 × 2033) |
+
+Chaque meuble porte sa **référence de devis**, visible et modifiable dans le panneau
+de propriétés. Les murs, poteaux et portes sont marqués « existant » et le carrelage
+est conservé : l'aménagement se construit autour.
+
+**Écarts entre documents.** Le relevé donne 8,20 m hors tout là où le plan
+d'implantation suppose environ 8,50 m ; c'est le relevé qui a été suivi, et les allées
+ont été ramenées de 180/165/180 à environ 145/150/150. De même, le plan annonçait
+12 portes de froid positif quand le dossier EPTA, plus récent, en retient 10. Ces
+choix sont documentés en tête de `src/lib/projects/hagetmau.ts`.
+
 ## Raccourcis clavier
 
 | Raccourci | Action |

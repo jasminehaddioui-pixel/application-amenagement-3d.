@@ -295,6 +295,17 @@ export const CATALOG: CatalogEntry[] = [
     shelves: 5,
   },
   {
+    id: 'locker',
+    name: 'Locker / consigne',
+    category: 'autres',
+    width: 1.0,
+    depth: 0.6,
+    height: 2.0,
+    color: '#5b6b7a',
+    style: 'box',
+    description: 'Colonne de casiers (retrait de colis).',
+  },
+  {
     id: 'comptoir',
     name: 'Comptoir',
     category: 'autres',

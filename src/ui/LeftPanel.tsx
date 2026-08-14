@@ -115,6 +115,22 @@ function ZonesTab() {
   return (
     <div className="panel-body">
       <div className="section">
+        <h3 className="section-title">Implantation automatique</h3>
+        <button
+          type="button"
+          className="btn primary"
+          style={{ width: '100%' }}
+          onClick={() => store.getState().setAutoLayoutOpen(true)}
+        >
+          Générer un magasin complet
+        </button>
+        <p className="hint">
+          Compose en une fois les murs, la réserve, les zones, les gondoles, le froid et la ligne de
+          caisses à partir des dimensions du local.
+        </p>
+      </div>
+
+      <div className="section">
         <h3 className="section-title">Créer une zone</h3>
         <p className="hint" style={{ marginTop: 0, marginBottom: 8 }}>
           Un clic pose une zone rectangulaire au centre de la vue. Utilisez « Zone libre » dans la barre d'outils

@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verifier:implantation": "esbuild scripts/verifier-implantation.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/verifier-implantation.mjs && node node_modules/.cache/verifier-implantation.mjs"
   },
   "dependencies": {
     "jspdf": "^2.5.2",
