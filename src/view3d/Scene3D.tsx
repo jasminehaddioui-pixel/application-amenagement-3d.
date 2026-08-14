@@ -39,6 +39,10 @@ export default function Scene3D() {
   const frameRef = useRef<number>(0);
   const [preset, setPreset] = useState<View3DPreset>('exterieur');
   const [ready, setReady] = useState(false);
+  /** Vrai des que l'utilisateur a bouge la camera : on cesse alors de recadrer tout seul. */
+  const userMovedRef = useRef(false);
+  const presetRef = useRef<View3DPreset>('exterieur');
+  const applyPresetRef = useRef<(p: View3DPreset) => void>(() => {});
 
   const project = useEditor((s) => s.project);
   const notify = useEditor((s) => s.notify);
@@ -118,13 +122,24 @@ export default function Scene3D() {
       return r.domElement.toDataURL('image/png');
     };
 
+    controls.addEventListener('start', () => {
+      userMovedRef.current = true;
+    });
+
     const resize = () => {
       const rect = mount.getBoundingClientRect();
       const w = Math.max(1, rect.width);
       const h = Math.max(1, rect.height);
-      renderer.setSize(w, h, false);
+      // Le troisieme argument doit rester a `true` : sans mise a jour du style,
+      // le canevas garde la taille de son tampon (multipliee par le rapport de
+      // pixels de l'ecran) et deborde du conteneur sur les ecrans haute densite.
+      renderer.setSize(w, h, true);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // Le cadrage depend des proportions de l'image : tant que l'utilisateur
+      // n'a pas pris la main, on le recalcule (premiere mise en page, rotation
+      // de l'ecran, ouverture d'un panneau).
+      if (!userMovedRef.current) applyPresetRef.current(presetRef.current);
     };
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
@@ -167,6 +182,11 @@ export default function Scene3D() {
     const built = buildScene(project);
     builtRef.current = built;
     scene.add(built.root);
+
+    // La brume doit s'adapter a la taille du local : une portee fixe faisait
+    // disparaitre les grands magasins dans le fond, une fois la camera reculee.
+    const r = Math.max(1, built.bounds.getBoundingSphere(new THREE.Sphere()).radius);
+    scene.fog = new THREE.Fog('#0f1318', Math.max(25, r * 2.5), Math.max(90, r * 8));
   }, [project, ready]);
 
   // ------------------------------------------------------------ cadrage camera
@@ -179,28 +199,45 @@ export default function Scene3D() {
 
       const box = built.bounds;
       const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      const radius = Math.max(size.x, size.z) * 0.5 + 2;
+      const sphere = box.getBoundingSphere(new THREE.Sphere());
+      const radius = Math.max(1, sphere.radius);
+
+      /**
+       * Distance a laquelle une sphere de rayon `radius` tient entierement dans
+       * l'image. On retient le plus etroit des deux champs de vision : sur un
+       * ecran haut et etroit c'est l'horizontal qui contraint le cadrage, et
+       * l'ignorer rejetait la maquette hors de l'ecran sur telephone.
+       */
+      const fitDistance = (margin = 1.12): number => {
+        const vFov = (camera.fov * Math.PI) / 180;
+        const hFov = 2 * Math.atan(Math.tan(vFov / 2) * Math.max(0.1, camera.aspect));
+        return (radius * margin) / Math.sin(Math.min(vFov, hFov) / 2);
+      };
 
       if (p === 'dessus') {
-        camera.position.set(center.x, Math.max(12, radius * 2.1), center.z + 0.01);
+        const d = fitDistance();
+        // Le leger decalage en Z evite la singularite de la camera a la verticale.
+        camera.position.set(center.x, center.y + d, center.z + d * 0.001);
         controls.target.set(center.x, 0, center.z);
         controls.maxPolarAngle = Math.PI * 0.499;
-        controls.minDistance = 2;
-        controls.maxDistance = 300;
+        controls.minDistance = 1;
+        controls.maxDistance = d * 4;
       } else if (p === 'interieur') {
         const pose = interiorPose(project);
         camera.position.copy(pose.position);
         controls.target.copy(pose.target);
         controls.maxPolarAngle = Math.PI * 0.85;
         controls.minDistance = 0.4;
-        controls.maxDistance = 60;
+        controls.maxDistance = Math.max(20, radius * 3);
       } else {
-        camera.position.set(center.x + radius * 1.25, radius * 1.05 + 4, center.z + radius * 1.5);
-        controls.target.set(center.x, size.y * 0.35, center.z);
+        const d = fitDistance();
+        // Vue en trois quarts, la plus lisible pour saisir un volume.
+        const dir = new THREE.Vector3(0.72, 0.5, 0.95).normalize();
+        camera.position.copy(center).addScaledVector(dir, d);
+        controls.target.copy(center);
         controls.maxPolarAngle = Math.PI * 0.495;
         controls.minDistance = 1;
-        controls.maxDistance = 300;
+        controls.maxDistance = d * 4;
       }
       camera.updateProjectionMatrix();
       controls.update();
@@ -208,9 +245,26 @@ export default function Scene3D() {
     [project],
   );
 
+  // Le gestionnaire de redimensionnement, cree au montage, doit pouvoir
+  // appeler la version courante du cadrage.
+  useEffect(() => {
+    applyPresetRef.current = applyPreset;
+    presetRef.current = preset;
+  }, [applyPreset, preset]);
+
+  /** Cadrage demande explicitement : on reprend la main sur la camera. */
+  const recenter = useCallback(
+    (p: View3DPreset) => {
+      userMovedRef.current = false;
+      applyPreset(p);
+    },
+    [applyPreset],
+  );
+
   // Cadrage initial, puis a chaque changement de vue demande
   useEffect(() => {
     if (!ready) return;
+    userMovedRef.current = false;
     applyPreset(preset);
   }, [preset, ready, applyPreset]);
 
@@ -242,7 +296,7 @@ export default function Scene3D() {
               className={preset === id ? 'active' : ''}
               onClick={() => {
                 setPreset(id);
-                applyPreset(id);
+                recenter(id);
               }}
             >
               {lbl}
@@ -256,7 +310,7 @@ export default function Scene3D() {
           <button type="button" onClick={() => zoom(1.2)} title="Zoom arrière">
             −
           </button>
-          <button type="button" onClick={() => applyPreset(preset)} title="Recadrer">
+          <button type="button" onClick={() => recenter(preset)} title="Recadrer">
             Recadrer
           </button>
         </div>
