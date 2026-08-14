@@ -38,6 +38,17 @@ function box(
 const overlap = (a: Box, b: Box, tol = 0.005) =>
   a.x0 < b.x1 - tol && b.x0 < a.x1 - tol && a.y0 < b.y1 - tol && b.y0 < a.y1 - tol;
 
+/**
+ * Un poteau entièrement contenu dans l'emprise d'un meuble est habillé, pas
+ * heurté : c'est la façon normale de traiter un poteau en agencement. Seul un
+ * recouvrement partiel est un défaut d'implantation.
+ */
+const encloses = (furniture: Box, column: Box, tol = 0.005) =>
+  furniture.x0 <= column.x0 + tol &&
+  furniture.y0 <= column.y0 + tol &&
+  furniture.x1 >= column.x1 - tol &&
+  furniture.y1 >= column.y1 - tol;
+
 const project = buildHagetmauProject();
 const { items, columns, zones, walls, openings } = project.floor;
 
@@ -58,9 +69,12 @@ const colBoxes = columns.map((c) => box(c.name ?? 'Poteau', c.x, c.y, c.width, c
 
 const problems: string[] = [];
 
+const dressed: string[] = [];
 for (const b of itemBoxes) {
   for (const c of colBoxes) {
-    if (overlap(b, c)) problems.push(`poteau   ${c.label}  ✗  ${b.label}`);
+    if (!overlap(b, c)) continue;
+    if (encloses(b, c)) dressed.push(`${c.label}  habillé par  ${b.label}`);
+    else problems.push(`poteau   ${c.label}  ✗  ${b.label}`);
   }
 }
 for (let i = 0; i < itemBoxes.length; i++) {
@@ -115,6 +129,12 @@ for (const g of circ.gaps.filter((x) => x.narrow)) {
     `   ${g.width.toFixed(2)} m  entre ${g.a.label} et ${g.b.label}` +
       `  [(${g.from.x.toFixed(2)} ; ${g.from.y.toFixed(2)}) → (${g.to.x.toFixed(2)} ; ${g.to.y.toFixed(2)})]`,
   );
+}
+
+if (dressed.length) {
+  console.log('');
+  console.log(`poteaux habillés   ${dressed.length}`);
+  dressed.forEach((d) => console.log('   ' + d));
 }
 
 console.log('');
