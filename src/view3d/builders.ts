@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { Item, Opening, Project, Vec2, Wall } from '../types';
 import { catalogEntry, type Item3DStyle } from '../lib/catalog';
-import { polygonBounds, wallLength, wallPolygon } from '../lib/geometry';
+import { polygonArea, polygonBounds, wallLength, wallPolygon } from '../lib/geometry';
 
 /**
  * Generation du modele 3D a partir du plan 2D.
@@ -554,15 +554,21 @@ const EYE_HEIGHT = 1.65;
  * centre : c'est le point de vue qui donne la meilleure lecture d'un magasin.
  * L'angle retenu est celui qui est le plus degage du mobilier, pour ne pas
  * demarrer la visite le nez contre une gondole.
+ * Quand le plan delimite une surface de vente, c'est elle qui sert de cadre :
+ * sur un magasin cloisonne, les angles du batiment tombent dans une reserve ou
+ * un local technique, et la visite demarrerait dans un placard.
  */
 export function interiorPose(project: Project): { position: THREE.Vector3; target: THREE.Vector3 } {
   const { floor } = project;
 
   const pts: Vec2[] = [];
-  floor.walls.forEach((w) => pts.push(w.a, w.b));
-  if (!pts.length) {
-    const sales = floor.zones.find((z) => z.category === 'vente') ?? floor.zones[0];
-    if (sales && sales.points.length >= 3) sales.points.forEach((p) => pts.push(p));
+  const sales = floor.zones
+    .filter((z) => z.category === 'vente' && z.points.length >= 3)
+    .sort((a, b) => polygonArea(b.points) - polygonArea(a.points))[0];
+  if (sales) {
+    sales.points.forEach((p) => pts.push(p));
+  } else {
+    floor.walls.forEach((w) => pts.push(w.a, w.b));
   }
   if (!pts.length) {
     return {

@@ -17,6 +17,9 @@ npm install
 npm run dev        # serveur de développement sur http://localhost:5173
 npm run build      # vérification TypeScript + build de production dans dist/
 npm run preview    # sert le build de production sur http://localhost:4173
+
+npm run verifier:implantation   # contrôle du générateur automatique
+npm run verifier:hagetmau       # contrôle géométrique du magasin de référence
 ```
 
 Prérequis : Node.js 18 ou supérieur. Le navigateur doit supporter WebGL pour la vue 3D.
@@ -205,9 +208,10 @@ Sources utilisées, par ordre d'autorité :
 
 | Document | Ce qui en est repris |
 |---|---|
-| Relevé manuscrit du local | coque 23,20 × 8,20 m hors tout, murs 20 cm, 3 poteaux existants, porte de service 1,50 m |
-| Plan d'implantation `hagetmau_2` | 18,77 m de vente, lockers Amazon, presse, entrée en pignon, principe de zonage |
-| Devis RAY-ORG n° DE2026-133 | muraux h. 2200 (7,03 + 3,03 + 6,03 + 1,03 ml), 8 modules centraux double face, têtes de gondole, gondoles basses h. 1500 |
+| Dossier Technique Amiante n° 25/1412/BARICOS, § 7.1 « schéma de repérage RDC » | la **coque** : 8,60 m hors œuvre en pignon et la distribution réelle des locaux — Local technique, WC + dégagement, Remise 1/2/3 au fond, Bureau 1 et Bureau 2 en retour à gauche, magasin sur le reste |
+| Relevé manuscrit du local | l'**échelle** : 23,20 × 8,20 m dans œuvre, surface de vente à 16,00 m de la façade, murs 20 cm, six éléments de structure (poteaux + gaine), porte de service 1,50 m |
+| Plan d'implantation `hagetmau_2` | lockers Amazon, presse, entrée en pignon, principe de zonage et largeurs d'allées visées |
+| Devis RAY-ORG n° DE2026-133 | muraux h. 2200 (module 1000, profondeur 550), 8 modules centraux double face h. 2200, 4 têtes de gondole 1,03 ml, gondoles basses h. 1500 |
 | Trame devis TILT | caisse bi-optique L 1400, îlot fruits et légumes H 155 de 2 ml |
 | Dossier technique EPTA n° 260710-6140B | cotes hors tout exactes du froid : EIS 162 HP (1875 × 786 × 2035), EIS 112 HP (1250 × 786 × 2032), Multifreeze Plus Efficia 3P (2100 × 763 × 2033) |
 
@@ -215,11 +219,25 @@ Chaque meuble porte sa **référence de devis**, visible et modifiable dans le p
 de propriétés. Les murs, poteaux et portes sont marqués « existant » et le carrelage
 est conservé : l'aménagement se construit autour.
 
-**Écarts entre documents.** Le relevé donne 8,20 m hors tout là où le plan
-d'implantation suppose environ 8,50 m ; c'est le relevé qui a été suivi, et les allées
-ont été ramenées de 180/165/180 à environ 145/150/150. De même, le plan annonçait
-12 portes de froid positif quand le dossier EPTA, plus récent, en retient 10. Ces
+**Comment les deux plans se recoupent.** Le DTA cote 8,60 m hors œuvre, le relevé
+8,20 m dans œuvre : l'écart vaut exactement deux murs de 20 cm, les deux documents
+décrivent donc bien la même coque. Le schéma du DTA n'est pas à l'échelle — il fixe
+la topologie, pas les mesures ; c'est le relevé qui donne les cotes. Le relevé place
+la limite vente / arrière à 16,00 m de la façade, et les poteaux P2 et P4 tombent
+tous les deux sur cette ligne : ce sont eux qui portent le refend. Il reste 7,20 m
+au fond, ce qui loge le bandeau de services (2,45 m de profondeur) et les deux
+bureaux, exactement comme au DTA. La cote de 18,77 m du plan d'implantation ignorait
+cette zone arrière et n'a pas été retenue.
+
+**Écarts assumés.** 15 modules de muraux posés contre 17,12 ml au devis (les poteaux,
+la gaine technique et la porte de service coupent le linéaire), 2 modules h. 1500 sur
+les 5 du devis (le poteau P3 tombe au milieu de la file A), et 10 portes de froid
+positif comme au dossier EPTA plutôt que les 12 du plan d'implantation. Tous ces
 choix sont documentés en tête de `src/lib/projects/hagetmau.ts`.
+
+**Contrôle mécanique.** `npm run verifier:hagetmau` reconstruit le magasin et vérifie
+qu'aucun meuble ne chevauche un poteau, un autre meuble ou la coque, que chaque
+ouverture tient dans son mur, et qu'aucune allée client ne descend sous 1,40 m.
 
 ## Raccourcis clavier
 

@@ -93,14 +93,23 @@ const IGNORED_FOR_AISLES = new Set(['terminal-paiement', 'panier', 'chariot']);
 export function buildObstacles(floor: Floor, includeWalls = true): Obstacle[] {
   const obs: Obstacle[] = [];
 
-  // La réserve n'est pas accessible au public : ses allées de service, plus
-  // étroites, ne relèvent pas de la circulation clients.
-  const reserves = floor.zones.filter((z) => z.category === 'reserve' && z.points.length >= 3);
-  const inReserve = (p: Vec2) => reserves.some((z) => pointInPolygon(p, z.points));
+  // Seule la surface de vente relève de la circulation clients. Quand le plan
+  // délimite une zone de vente, on s'y tient : réserve, remises, bureaux, WC,
+  // local technique ont des passages de service plus étroits, qui n'ont pas à
+  // être mesurés à l'aune des allées du magasin. À défaut de zone de vente, on
+  // se contente d'écarter la réserve.
+  const zonesOf = (cat: string) =>
+    floor.zones.filter((z) => z.category === cat && z.points.length >= 3);
+  const sales = zonesOf('vente');
+  const reserves = zonesOf('reserve');
+  const isCustomerArea = (p: Vec2) =>
+    sales.length
+      ? sales.some((z) => pointInPolygon(p, z.points))
+      : !reserves.some((z) => pointInPolygon(p, z.points));
 
   for (const it of floor.items) {
     if (IGNORED_FOR_AISLES.has(it.catalogId)) continue;
-    if (inReserve({ x: it.x, y: it.y })) continue;
+    if (!isCustomerArea({ x: it.x, y: it.y })) continue;
     obs.push({ id: it.id, label: it.name, poly: itemCorners(it), type: 'item' });
   }
   if (includeWalls) {
@@ -117,12 +126,25 @@ export function buildObstacles(floor: Floor, includeWalls = true): Obstacle[] {
  */
 function segmentIsClear(from: Vec2, to: Vec2, obstacles: Obstacle[], skipA: string, skipB: string): boolean {
   const steps = 6;
+  const len = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+  // Décalage lateral de 2 cm : quand la mesure longe la face d'un meuble sans
+  // la traverser franchement, le test « point dans le polygone » tombe sur la
+  // frontiere et laisse passer une allee qui n'existe pas. On sonde donc aussi
+  // de part et d'autre du segment.
+  const nx = (-(to.y - from.y) / len) * 0.02;
+  const ny = ((to.x - from.x) / len) * 0.02;
   for (let s = 1; s < steps; s++) {
     const t = s / steps;
-    const p: Vec2 = { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
+    const cx = from.x + (to.x - from.x) * t;
+    const cy = from.y + (to.y - from.y) * t;
+    const probes: Vec2[] = [
+      { x: cx, y: cy },
+      { x: cx + nx, y: cy + ny },
+      { x: cx - nx, y: cy - ny },
+    ];
     for (const o of obstacles) {
       if (o.id === skipA || o.id === skipB) continue;
-      if (pointInPolygon(p, o.poly)) return false;
+      if (probes.some((p) => pointInPolygon(p, o.poly))) return false;
     }
   }
   return true;
