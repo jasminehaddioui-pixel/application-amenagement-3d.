@@ -34,11 +34,20 @@ export interface Wall {
   color?: string;
 }
 
-/** Une porte ou une fenetre percee dans un mur. */
+export type OpeningType = 'door' | 'window' | 'sliding';
+
+/**
+ * Une baie percee dans un mur.
+ *  - 'door'    : porte battante, avec un sens d'ouverture ;
+ *  - 'window'  : fenetre ou vitrine, posee sur une allege ;
+ *  - 'sliding' : porte vitree automatique a deux vantaux coulissants, telle
+ *                qu'on la trouve en facade de magasin. Elle n'a pas de sens
+ *                d'ouverture : les vantaux s'effacent lateralement.
+ */
 export interface Opening {
   id: string;
   kind: 'opening';
-  type: 'door' | 'window';
+  type: OpeningType;
   wallId: string;
   /** Distance en metres depuis le point a du mur, jusqu'au CENTRE de l'ouverture */
   offset: number;
@@ -211,6 +220,7 @@ export type ToolId =
   | 'partition'
   | 'door'
   | 'window'
+  | 'sliding'
   | 'column'
   | 'zone'
   | 'dimension'

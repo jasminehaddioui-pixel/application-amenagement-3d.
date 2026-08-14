@@ -367,7 +367,9 @@ function ExistingTab() {
   const store = useEditor;
 
   const keptWalls = floor.walls.filter((w) => w.existing).length;
-  const keptDoors = floor.openings.filter((o) => o.type === 'door' && o.existing).length;
+  const keptDoors = floor.openings.filter(
+    (o) => (o.type === 'door' || o.type === 'sliding') && o.existing,
+  ).length;
   const keptWindows = floor.openings.filter((o) => o.type === 'window' && o.existing).length;
 
   return (

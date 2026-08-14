@@ -108,6 +108,7 @@ export function projectStats(project: Project) {
     walls: floor.walls.length,
     doors: floor.openings.filter((o) => o.type === 'door').length,
     windows: floor.openings.filter((o) => o.type === 'window').length,
+    sliding: floor.openings.filter((o) => o.type === 'sliding').length,
     columns: floor.columns.length,
     items: floor.items.length,
     zones: floor.zones.length,
@@ -175,7 +176,11 @@ export async function exportPlanPDF(project: Project): Promise<void> {
 
   pdf.text(`Échelle approx. 1 : ${scaleDenominator}`, col2, cy + 14);
   pdf.text(`Murs : ${s.walls}`, col2, cy + 19);
-  pdf.text(`Portes : ${s.doors}   Fenêtres : ${s.windows}`, col2, cy + 24);
+  pdf.text(
+    `Portes : ${s.doors}   Fenêtres : ${s.windows}   Portes auto. : ${s.sliding}`,
+    col2,
+    cy + 24,
+  );
   pdf.text(`Poteaux : ${s.columns}`, col2, cy + 29);
 
   pdf.text(`Surface de vente : ${s.salesArea.toFixed(2)} m²`, col3, cy + 14);
@@ -297,7 +302,7 @@ export async function printPlan(project: Project): Promise<void> {
   <div>Édité le ${fmtDate(Date.now())}</div>
   <div>Échelle approx. 1 : ${scaleDenominator}</div>
   <div>Hauteur sous plafond : ${project.settings.wallHeight.toFixed(2)} m</div>
-  <div>Murs : ${s.walls} — Portes : ${s.doors} — Fenêtres : ${s.windows}</div>
+  <div>Murs : ${s.walls} — Portes : ${s.doors} — Fenêtres : ${s.windows} — Portes auto. : ${s.sliding}</div>
   <div>Surface de vente : ${s.salesArea.toFixed(2)} m²</div>
   <div>Total zones : ${s.totalZoneArea.toFixed(2)} m²</div>
   <div>Mobilier : ${s.items} objets</div>

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useEditor } from '../state/store';
-import type { AnyElement, ItemCategory, ZoneCategory } from '../types';
+import type { AnyElement, ItemCategory, OpeningType, ZoneCategory } from '../types';
 import { CATEGORY_LABELS, catalogEntry } from '../lib/catalog';
 import { ZONE_PRESETS, ZONE_PRESET_BY_CATEGORY } from '../lib/zones';
 import {
@@ -21,6 +21,19 @@ const KIND_LABELS: Record<AnyElement['kind'], string> = {
   zone: 'Zone',
   item: 'Objet',
   dimension: 'Cotation',
+};
+
+const OPENING_LABELS: Record<OpeningType, string> = {
+  door: 'Porte',
+  window: 'Fenêtre',
+  sliding: 'Porte vitrée automatique',
+};
+
+/** Cotes reprises quand on change le type d'une baie. */
+const OPENING_DEFAULTS: Record<OpeningType, { sill: number; height: number }> = {
+  door: { sill: 0, height: 2.1 },
+  window: { sill: 1, height: 1.2 },
+  sliding: { sill: 0, height: 2.2 },
 };
 
 export default function PropertiesPanel() {
@@ -240,11 +253,13 @@ export default function PropertiesPanel() {
 
           <div className="section">
             <h3 className="section-title">Ouvertures ({openings.length})</h3>
-            {openings.length === 0 && <p className="hint">Aucune ouverture. Utilisez les outils Porte ou Fenêtre.</p>}
+            {openings.length === 0 && (
+              <p className="hint">Aucune ouverture. Utilisez les outils Porte, Fenêtre ou Porte auto.</p>
+            )}
             <div className="sel-list">
               {openings.map((o) => (
                 <button key={o.id} type="button" className="sel-row" onClick={() => st.select([o.id])}>
-                  <span className="tag">{o.type === 'door' ? 'porte' : 'fenêtre'}</span>
+                  <span className="tag">{OPENING_LABELS[o.type].toLowerCase()}</span>
                   <span>
                     {fmtM(o.width)} à {fmtM(o.offset)} du départ
                   </span>
@@ -266,22 +281,18 @@ export default function PropertiesPanel() {
         <div className="panel-body">
           <div className="section">
             <h3 className="section-title">
-              {el.type === 'door' ? 'Porte' : 'Fenêtre'}
+              {OPENING_LABELS[el.type]}
               {el.existing && <span className="badge ok">existante</span>}
             </h3>
             <SelectField
               label="Type"
               value={el.type}
               options={[
-                ['door', 'Porte'],
-                ['window', 'Fenêtre'],
+                ['door', OPENING_LABELS.door],
+                ['window', OPENING_LABELS.window],
+                ['sliding', OPENING_LABELS.sliding],
               ]}
-              onCommit={(v) =>
-                st.updateOpening(el.id, {
-                  type: v,
-                  ...(v === 'door' ? { sill: 0, height: 2.1 } : { sill: 1, height: 1.2 }),
-                })
-              }
+              onCommit={(v) => st.updateOpening(el.id, { type: v, ...OPENING_DEFAULTS[v] })}
             />
             <div className="grid2">
               <NumberField label="Largeur" unit="m" value={el.width} min={0.3} onCommit={(v) => st.updateOpening(el.id, { width: v })} />
@@ -302,16 +313,24 @@ export default function PropertiesPanel() {
               max={L}
               onCommit={(v) => st.updateOpening(el.id, { offset: v })}
             />
-            <CheckRow
-              checked={el.flip}
-              onChange={(v) => st.updateOpening(el.id, { flip: v })}
-              title="Inverser le sens"
-              subtitle="Change le côté du gond / de l'ouverture"
-            />
+            {el.type === 'door' && (
+              <CheckRow
+                checked={el.flip}
+                onChange={(v) => st.updateOpening(el.id, { flip: v })}
+                title="Inverser le sens"
+                subtitle="Change le côté du gond"
+              />
+            )}
+            {el.type === 'sliding' && (
+              <p className="hint">
+                Deux vantaux vitrés qui s'effacent latéralement : la porte n'a pas de sens
+                d'ouverture, et le passage libre vaut toute la largeur de la baie.
+              </p>
+            )}
             <CheckRow
               checked={el.existing}
               onChange={(v) => st.updateOpening(el.id, { existing: v })}
-              title={el.type === 'door' ? 'Porte existante à conserver' : 'Fenêtre existante à conserver'}
+              title={`${OPENING_LABELS[el.type]} existante à conserver`}
             />
           </div>
           {wall && (
@@ -639,6 +658,10 @@ function PlanSummary() {
           <div className="stat">
             <div className="k">Fenêtres</div>
             <div className="v">{floor.openings.filter((o) => o.type === 'window').length}</div>
+          </div>
+          <div className="stat">
+            <div className="k">Portes auto.</div>
+            <div className="v">{floor.openings.filter((o) => o.type === 'sliding').length}</div>
           </div>
           <div className="stat">
             <div className="k">Poteaux</div>

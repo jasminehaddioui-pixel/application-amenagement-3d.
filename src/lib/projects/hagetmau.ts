@@ -379,6 +379,16 @@ const GROUPE: Spec = {
 
 // ------------------------------------------------------------------- montage
 
+export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
+
+/**
+ * Identifiant du projet de référence. Il change chaque fois que le magasin est
+ * remonté d'après un nouveau document. L'application s'en sert pour repérer
+ * qu'une copie enregistrée dans le navigateur est périmée et ouvrir la version
+ * à jour à la place — l'ancienne reste dans la liste des projets.
+ */
+export const HAGETMAU_ID = 'hagetmau-batiment-complet';
+
 export function buildHagetmauProject(): Project {
   const walls: Wall[] = [];
   const openings: Opening[] = [];
@@ -388,24 +398,42 @@ export function buildHagetmauProject(): Project {
 
   const h = WALL / 2;
 
-  // --- enveloppe : rectangle 16,60 × 26,25 hors œuvre
-  const corners: Vec2[] = [
-    { x: h, y: h },
-    { x: EXT_W - h, y: h },
-    { x: EXT_W - h, y: EXT_L - h },
-    { x: h, y: EXT_L - h },
+  // --- enveloppe en L. L'aile gauche s'arrête au mur biais ; au-delà, seul le
+  // magasin continue jusqu'à la rue, sur ses 8,00 m de large.
+  const outline: Vec2[] = [
+    { x: h, y: h }, //                    angle arrière gauche
+    { x: EXT_W - h, y: h }, //            mur du fond
+    { x: EXT_W - h, y: EXT_L - h }, //    mur droit, jusqu'à la rue
+    { x: SHOP_L - h, y: EXT_L - h }, //   façade sur rue (pignon du magasin)
+    { x: SHOP_L - h, y: WING_END + 1.1 }, // flanc gauche du magasin, en extérieur
+    { x: h, y: WING_END + 2.1 }, //       mur biais (hachuré au plan)
   ];
-  for (let i = 0; i < 4; i++) {
-    walls.push(wall(corners[i], corners[(i + 1) % 4], 'wall', WALL));
+  for (let i = 0; i < outline.length; i++) {
+    walls.push(wall(outline[i], outline[(i + 1) % outline.length], 'wall', WALL));
   }
-  const frontWall = walls[2]; // tracé de droite à gauche
+  const frontWall = walls[2]; // façade, tracée de droite à gauche
 
-  // Entrée client en pignon sur rue, dans l'axe du magasin.
+  // --- façade vitrée (BAT Agelia « Mise en situation V2 »)
+  // Vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe. Les
+  // trumeaux entre les baies correspondent aux montants blancs de la façade.
   const entranceX = 12.0;
-  openings.push(door(frontWall.id, EXT_W - h - entranceX, 1.8));
-
-  // --- mur biais qui ferme l'aile gauche au sud (hachuré au plan)
-  walls.push(wall({ x: h, y: WING_END + 1.1 }, { x: SHOP_L - h, y: WING_END + 0.1 }, 'wall', WALL));
+  const onFront = (x: number) => EXT_W - h - x; // le mur est tracé de droite à gauche
+  const GLAZE_H = 2.45;
+  const GLAZE_SILL = 0.15;
+  // La devanture est neuve : elle n'est pas marquée « existant ».
+  const vitrine = (x: number, w: number): Opening => ({
+    ...door(frontWall.id, onFront(x), w, false),
+    type: 'window',
+    height: GLAZE_H,
+    sill: GLAZE_SILL,
+  });
+  openings.push(vitrine(9.7, 2.2));
+  openings.push({
+    ...door(frontWall.id, onFront(entranceX), 1.8, false),
+    type: 'sliding',
+    height: 2.2,
+  });
+  openings.push(vitrine(14.6, 2.8));
 
   // ------------------------------------------------- bandeau de locaux du fond
   const bandWall = wall({ x: XL, y: BAND_Y + h }, { x: XR, y: BAND_Y + h }, 'wall', WALL);
@@ -418,7 +446,9 @@ export function buildHagetmauProject(): Project {
   }
 
   // ------------------------------------------------------------- aile gauche
-  const wingWall = wall({ x: WING_R + h, y: BACK_FACE }, { x: WING_R + h, y: WING_END + 0.6 }, 'wall', WALL);
+  // Refend aile / magasin. Il rejoint l'angle du mur biais : au-delà, la même
+  // ligne devient le flanc extérieur du magasin.
+  const wingWall = wall({ x: WING_R + h, y: BACK_FACE }, { x: WING_R + h, y: WING_END + 1.1 }, 'wall', WALL);
   walls.push(wingWall);
   openings.push(door(wingWall.id, 1.4, 1.5)); // liaison aile / réserve du magasin
 
@@ -573,8 +603,8 @@ export function buildHagetmauProject(): Project {
   // ------------------------------------------------------------- le projet
   const now = Date.now();
   return {
-    id: uid('prj'),
-    name: 'Panier Sympa — Hagetmau',
+    id: HAGETMAU_ID,
+    name: HAGETMAU_NAME,
     createdAt: now,
     updatedAt: now,
     floor: { ...emptyFloor(), walls, openings, columns, zones, items },

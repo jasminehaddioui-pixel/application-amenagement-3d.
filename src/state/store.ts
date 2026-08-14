@@ -8,6 +8,7 @@ import type {
   Floor,
   Item,
   Opening,
+  OpeningType,
   Project,
   ProjectSettings,
   ToolId,
@@ -29,7 +30,7 @@ import {
   wallLength,
 } from '../lib/geometry';
 import type { GeneratedLayout } from '../lib/autoLayout';
-import { buildHagetmauProject } from '../lib/projects/hagetmau';
+import { buildHagetmauProject, HAGETMAU_ID, HAGETMAU_NAME } from '../lib/projects/hagetmau';
 import {
   createProject,
   loadProject,
@@ -138,7 +139,7 @@ interface EditorState {
   // ---- edition du plan
   addWall: (a: Vec2, b: Vec2, type: 'wall' | 'partition') => string;
   updateWall: (id: string, patch: Partial<Wall>) => void;
-  addOpening: (wallId: string, offset: number, type: 'door' | 'window') => string | null;
+  addOpening: (wallId: string, offset: number, type: OpeningType) => string | null;
   updateOpening: (id: string, patch: Partial<Opening>) => void;
   addColumn: (p: Vec2) => string;
   updateColumn: (id: string, patch: Partial<Column>) => void;
@@ -183,11 +184,21 @@ function initialProject(): Project {
   const id = lastProjectId();
   if (id) {
     const p = loadProject(id);
-    if (p) return p;
+    // Une copie périmée du magasin de référence, laissée dans le navigateur par
+    // une visite précédente, ne doit pas masquer la version à jour : on ouvre la
+    // nouvelle. L'ancienne reste accessible dans la liste des projets.
+    const stale = p != null && p.name === HAGETMAU_NAME && p.id !== HAGETMAU_ID;
+    if (p && !stale) return p;
   }
   // Premier lancement : on ouvre directement le magasin de Hagetmau, monté a
   // partir des relevés et des devis, plutôt qu'un plan vide.
-  return buildHagetmauProject();
+  const fresh = buildHagetmauProject();
+  try {
+    saveProject(fresh);
+  } catch {
+    // Stockage plein ou indisponible : on travaille quand même, sans persistance.
+  }
+  return fresh;
 }
 
 /** Retrouve un element du plan par son identifiant. */
@@ -385,12 +396,30 @@ export const useEditor = create<EditorState>((set, get) => ({
     const wall = get().project.floor.walls.find((w) => w.id === wallId);
     if (!wall) return null;
     const id = uid('o');
-    get().commit(type === 'door' ? 'Ajouter une porte' : 'Ajouter une fenêtre', (p) => {
+    const labels: Record<OpeningType, string> = {
+      door: 'Ajouter une porte',
+      window: 'Ajouter une fenêtre',
+      sliding: 'Ajouter une porte vitrée automatique',
+    };
+    // Dimensions courantes du commerce : porte battante 0,90, fenêtre 1,20 sur
+    // allège de 1,00, porte automatique de magasin 1,80 sur 2,20 de hauteur.
+    const defaults: Record<OpeningType, { width: number; height: number; sill: number }> = {
+      door: { width: 0.9, height: 2.1, sill: 0 },
+      window: { width: 1.2, height: 1.2, sill: 1 },
+      sliding: { width: 1.8, height: 2.2, sill: 0 },
+    };
+    get().commit(labels[type], (p) => {
       const w = p.floor.walls.find((x) => x.id === wallId)!;
-      const base: Opening =
-        type === 'door'
-          ? { id, kind: 'opening', type, wallId, offset, width: 0.9, height: 2.1, sill: 0, flip: false, existing: false }
-          : { id, kind: 'opening', type, wallId, offset, width: 1.2, height: 1.2, sill: 1, flip: false, existing: false };
+      const base: Opening = {
+        id,
+        kind: 'opening',
+        type,
+        wallId,
+        offset,
+        ...defaults[type],
+        flip: false,
+        existing: false,
+      };
       p.floor.openings.push(clampOpening(base, w));
     });
     return id;
@@ -769,8 +798,11 @@ export const useEditor = create<EditorState>((set, get) => ({
       // Cocher « conserver les murs » marque les murs actuels comme existants.
       if (patch.murs === true) p.floor.walls.forEach((w) => (w.existing = true));
       if (patch.murs === false) p.floor.walls.forEach((w) => (w.existing = false));
+      // Une porte vitrée automatique est une porte : elle suit la même case.
       if (patch.portes !== undefined)
-        p.floor.openings.filter((o) => o.type === 'door').forEach((o) => (o.existing = patch.portes!));
+        p.floor.openings
+          .filter((o) => o.type === 'door' || o.type === 'sliding')
+          .forEach((o) => (o.existing = patch.portes!));
       if (patch.fenetres !== undefined)
         p.floor.openings.filter((o) => o.type === 'window').forEach((o) => (o.existing = patch.fenetres!));
     });

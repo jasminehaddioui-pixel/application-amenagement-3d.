@@ -322,13 +322,14 @@ export default function Canvas2D() {
       }
 
       case 'door':
-      case 'window': {
+      case 'window':
+      case 'sliding': {
         const w = wallUnder(project, raw, tolWorld * 3);
         if (!w) {
           st.notify('Cliquez sur un mur pour y placer une ouverture.', 'error');
           return;
         }
-        const id = st.addOpening(w.wallId, w.offset, tool === 'door' ? 'door' : 'window');
+        const id = st.addOpening(w.wallId, w.offset, tool);
         if (id) {
           st.select([id]);
           st.setTool('select');
@@ -620,6 +621,7 @@ export default function Canvas2D() {
         c: 'partition',
         p: 'door',
         f: 'window',
+        b: 'sliding',
         o: 'column',
         z: 'zone',
         k: 'dimension',
@@ -642,7 +644,9 @@ export default function Canvas2D() {
       case 'door':
         return 'Cliquez sur un mur pour y percer une porte';
       case 'window':
-        return 'Cliquez sur un mur pour y percer une fenêtre';
+        return 'Cliquez sur un mur pour y percer une fenêtre ou une vitrine';
+      case 'sliding':
+        return 'Cliquez sur un mur pour y poser une porte vitrée automatique';
       case 'column':
         return 'Cliquez pour poser un poteau';
       case 'zone':

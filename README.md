@@ -70,7 +70,8 @@ build `npm run build` et le dossier de publication `dist`.
 | Murs | épaisseur et hauteur réglables, tracé en polyligne enchaînée |
 | Cloisons | même outil, épaisseur par défaut distincte |
 | Portes | percées dans un mur, largeur / hauteur / sens d'ouverture |
-| Fenêtres | percées dans un mur, largeur / hauteur / allège |
+| Fenêtres | percées dans un mur, largeur / hauteur / allège — sert aussi de vitrine |
+| Portes vitrées automatiques | devanture de magasin : deux vantaux coulissants qui s'effacent latéralement, rail au-dessus, passage libre sur toute la largeur de la baie |
 | Poteaux | section rectangulaire ou circulaire |
 | Zones | polygones nommés et colorés, surface calculée |
 | Cotations | cotations manuelles + **cotations automatiques** de chaque mur |
@@ -227,6 +228,7 @@ est conservé : l'aménagement se construit autour.
 | Bandeau de locaux au fond, 2,45 m de profondeur | Groupes froids, sanitaires, C.F. Crèmerie, C.F. Boucherie, laboratoire |
 | Aile gauche, 8,00 m de large, trois travées de 2,70 m entre contreforts | Réserve 1, Réserve 2, dégagement, fermée au sud par le mur biais |
 | Magasin, 8,00 × 23,20 m | réserve de 7,00 m au fond, puis 16,00 m de vente jusqu'à la façade — la cote 1600 du relevé |
+| Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 128 m² de vente, 104 m² de réserves et de locaux |
 
 **Traitement des poteaux.** Les poteaux ne coupent plus le linéaire : quand un poteau
@@ -254,6 +256,7 @@ comme habillé, un recouvrement partiel reste une erreur.
 | `V` / `H` | Sélection / Navigation |
 | `M` / `C` | Mur / Cloison |
 | `P` / `F` | Porte / Fenêtre |
+| `B` | Porte vitrée automatique |
 | `O` / `Z` / `K` | Poteau / Zone / Cotation |
 | `Entrée` | Terminer la polyligne en cours |
 | `Échap` | Annuler l'outil ou la sélection |

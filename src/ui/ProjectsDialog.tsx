@@ -82,6 +82,33 @@ export default function ProjectsDialog({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="section">
+            <h3 className="section-title">Magasin de référence</h3>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  try {
+                    saveProject(current);
+                  } catch {
+                    /* on charge quand meme le magasin de reference */
+                  }
+                  store.getState().loadHagetmau();
+                  refresh();
+                  onClose();
+                }}
+              >
+                Recharger « Panier Sympa — Hagetmau »
+              </button>
+            </div>
+            <p className="hint">
+              Remonte le magasin à la cote depuis les plans et les devis du projet : coque complète,
+              locaux du fond, aile de réserves, implantation de la surface de vente. Le projet
+              actuellement ouvert est enregistré avant le rechargement.
+            </p>
+          </div>
+
+          <div className="section">
             <h3 className="section-title">
               Projets enregistrés <span className="badge">{items.length}</span>
             </h3>

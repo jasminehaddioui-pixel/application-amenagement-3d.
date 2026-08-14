@@ -17,7 +17,13 @@ const TOOLS: ToolDef[][] = [
     { id: 'wall', glyph: '▬', label: 'Mur', title: 'Tracer des murs (M)' },
     { id: 'partition', glyph: '▭', label: 'Cloison', title: 'Tracer des cloisons (C)' },
     { id: 'door', glyph: '🚪', label: 'Porte', title: 'Percer une porte dans un mur (P)' },
-    { id: 'window', glyph: '🪟', label: 'Fenêtre', title: 'Percer une fenêtre dans un mur (F)' },
+    { id: 'window', glyph: '🪟', label: 'Fenêtre', title: 'Percer une fenêtre ou une vitrine (F)' },
+    {
+      id: 'sliding',
+      glyph: '🏬',
+      label: 'Porte auto.',
+      title: 'Poser une porte vitrée automatique de magasin (B)',
+    },
     { id: 'column', glyph: '◧', label: 'Poteau', title: 'Poser un poteau (O)' },
   ],
   [

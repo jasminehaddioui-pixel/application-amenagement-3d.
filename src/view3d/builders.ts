@@ -150,8 +150,8 @@ function addWall(
     const px = wall.a.x + Math.cos(angle) * mid;
     const py = wall.a.y + Math.sin(angle) * mid;
 
-    if (o.type === 'window') {
-      const glassMat = track.mat(
+    const glass = () =>
+      track.mat(
         new THREE.MeshPhysicalMaterial({
           color: '#bfe0f2',
           transparent: true,
@@ -162,11 +162,44 @@ function addWall(
           side: THREE.DoubleSide,
         }),
       );
+
+    if (o.type === 'window') {
       const geo = track.geo(new THREE.BoxGeometry(o.width * 0.94, o.height * 0.94, 0.02));
-      const glass = new THREE.Mesh(geo, glassMat);
-      glass.position.set(px, o.sill + o.height / 2, py);
-      glass.rotation.y = -angle;
-      root.add(glass);
+      const pane = new THREE.Mesh(geo, glass());
+      pane.position.set(px, o.sill + o.height / 2, py);
+      pane.rotation.y = -angle;
+      root.add(pane);
+    }
+
+    if (o.type === 'sliding') {
+      // Deux vantaux vitres, montres entrouverts, et leur rail au-dessus.
+      const leafW = o.width / 2;
+      const leafMat = glass();
+      const railMat = track.mat(
+        new THREE.MeshStandardMaterial({ color: '#9aa3ab', roughness: 0.4, metalness: 0.6 }),
+      );
+      for (const sign of [-1, 1]) {
+        const geo = track.geo(new THREE.BoxGeometry(leafW * 0.92, o.height * 0.96, 0.04));
+        const leaf = new THREE.Mesh(geo, leafMat);
+        // Vantail efface au quart de sa course, contre le tableau.
+        const ox = sign * (leafW / 2 + leafW * 0.12);
+        leaf.position.set(px + Math.cos(angle) * ox, o.height / 2, py + Math.sin(angle) * ox);
+        leaf.rotation.y = -angle;
+        root.add(leaf);
+        // Montant vertical du vantail, pour le lire de loin.
+        const stile = track.geo(new THREE.BoxGeometry(0.05, o.height * 0.96, 0.06));
+        const bar = new THREE.Mesh(stile, railMat);
+        const bx = sign * (leafW * 0.12);
+        bar.position.set(px + Math.cos(angle) * bx, o.height / 2, py + Math.sin(angle) * bx);
+        bar.rotation.y = -angle;
+        root.add(bar);
+      }
+      const railGeo = track.geo(new THREE.BoxGeometry(o.width + 0.24, 0.14, wall.thickness + 0.06));
+      const rail = new THREE.Mesh(railGeo, railMat);
+      rail.position.set(px, o.height + 0.07, py);
+      rail.rotation.y = -angle;
+      rail.castShadow = true;
+      root.add(rail);
     }
 
     // Encadrement (visible aussi bien pour les portes que les fenetres)

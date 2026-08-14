@@ -350,8 +350,27 @@ function drawWall(ctx: CanvasRenderingContext2D, w: Wall, o: RenderOptions, pal:
       ctx.arc(sh.x, sh.y, r, a0, a0 + Math.PI / 2, false);
       ctx.stroke();
       ctx.setLineDash([]);
+    } else if (op.type === 'sliding') {
+      // Porte vitree automatique : rail continu, puis les deux vantaux
+      // representes ouverts, effaces de part et d'autre de la baie.
+      const sel = o.selection.has(op.id);
+      ctx.strokeStyle = sel ? pal.accent : pal.dim;
+      ctx.lineWidth = sel ? 2.2 : 1.2;
+      ctx.setLineDash([5, 3]);
+      line(ctx, add(p1, mul(n, half)), add(p2, mul(n, half)), cam, vp);
+      ctx.setLineDash([]);
+      // Chaque vantail fait la moitie de la baie et coulisse vers son cote.
+      ctx.strokeStyle = sel ? pal.accent : pal.wallStroke;
+      ctx.lineWidth = sel ? 3.2 : 2.6;
+      const leaf = op.width / 2;
+      const off = mul(n, half * 0.35);
+      line(ctx, add(p1, off), add(add(p1, mul(d, leaf * 0.9)), off), cam, vp);
+      line(ctx, sub(p2, mul(d, leaf * 0.9)), p2, cam, vp);
+      // Le trait du second vantail est ramene sur l'autre face du mur.
+      ctx.lineWidth = sel ? 3.2 : 2.6;
+      line(ctx, sub(add(p2, mul(d, 0)), off), sub(sub(p2, mul(d, leaf * 0.9)), off), cam, vp);
     } else {
-      // Fenetre : double trait dans l'epaisseur
+      // Fenetre / vitrine : double trait dans l'epaisseur
       ctx.strokeStyle = o.selection.has(op.id) ? pal.accent : pal.dim;
       ctx.lineWidth = o.selection.has(op.id) ? 2.2 : 1.5;
       line(ctx, add(p1, mul(n, half * 0.45)), add(p2, mul(n, half * 0.45)), cam, vp);
