@@ -178,6 +178,21 @@ latérale gauche à onglets (bibliothèque d'objets, zones, plan importé, exist
 réglages), barre d'outils, grande zone de travail, panneau de propriétés à droite,
 contrôles de zoom et notifications.
 
+### 12. Usage sur téléphone et tablette
+
+En dessous de 860 px de large, l'interface se réorganise pour laisser tout l'écran au
+plan :
+
+- les deux panneaux deviennent des **tiroirs coulissants**, ouverts par la barre basse
+  et refermés par un bouton dédié ou en touchant à côté ;
+- choisir un objet dans la bibliothèque **referme le tiroir automatiquement**, pour
+  pouvoir le poser immédiatement ;
+- la barre d'outils défile horizontalement, tous les outils restent accessibles ;
+- la barre basse regroupe bibliothèque, propriétés, zoom et cadrage ;
+- **pincer à deux doigts zoome et déplace le plan** en un seul geste, ce qui remplace
+  la molette ; un doigt suffit pour sélectionner, déplacer et tracer ;
+- la vue 3D se manipule au doigt (rotation à un doigt, déplacement et zoom à deux).
+
 ---
 
 ## Raccourcis clavier

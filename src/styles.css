@@ -637,6 +637,189 @@ textarea.input { height: auto; padding: 6px 8px; resize: vertical; }
 
 .file-input { display: none; }
 
+/* ------------------------------------------------------- menus deroulants */
+
+.menu-anchor { position: relative; }
+
+.dropdown {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  width: 268px;
+  padding: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dropdown .btn { width: 100%; justify-content: flex-start; height: 34px; }
+.dropdown-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+
 @media (max-width: 1180px) {
   :root { --sidebar-w: 250px; --props-w: 264px; }
+}
+
+/* ==========================================================================
+   Disposition téléphone : les panneaux deviennent des tiroirs coulissants
+   et le plan occupe toute la largeur.
+   ========================================================================== */
+
+@media (max-width: 860px) {
+  :root { --topbar-h: 48px; }
+
+  /* Les tiroirs sont rangés hors cadre : sans découpe, ils élargiraient la page. */
+  .app.mobile .app-body { position: relative; overflow: hidden; }
+
+  /* Les deux panneaux sortent du flux et glissent par-dessus le plan. */
+  .app.mobile .panel.left,
+  .app.mobile .panel.right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(82vw, 330px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    transition: transform 0.22s ease;
+    will-change: transform;
+  }
+
+  .app.mobile .panel.left { left: 0; transform: translateX(-102%); }
+  .app.mobile .panel.right { right: 0; transform: translateX(102%); }
+  .app.mobile.left-open .panel.left { transform: none; }
+  .app.mobile.right-open .panel.right { transform: none; }
+
+  .drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 7, 10, 0.55);
+    z-index: 35;
+  }
+
+  /* Bouton de fermeture placé dans la bande restée libre, jamais sous le tiroir. */
+  .drawer-close {
+    position: absolute;
+    top: 10px;
+    z-index: 45;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-elev);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  }
+  .drawer-close.on-right { right: 9px; }
+  .drawer-close.on-left { left: 9px; }
+
+  /* --- barre supérieure compacte */
+  .app.mobile .topbar { gap: 6px; padding: 0 8px; }
+  .app.mobile .project-name {
+    min-width: 0;
+    flex: 1;
+    max-width: none;
+    font-size: 13px;
+    padding: 5px 6px;
+  }
+  .app.mobile .topbar .spacer { display: none; }
+  .app.mobile .seg button { padding: 0 10px; font-size: 12px; }
+  .app.mobile .dropdown { width: min(80vw, 280px); }
+
+  /* --- barre d'outils : une seule ligne qui défile */
+  .app.mobile .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+  .app.mobile .toolbar::-webkit-scrollbar { display: none; }
+  .app.mobile .tool-group { flex: 0 0 auto; }
+  .app.mobile .tool { min-width: 46px; height: 38px; font-size: 9.5px; }
+  .app.mobile .tool .glyph { font-size: 16px; }
+  .app.mobile .toggle-chip { flex: 0 0 auto; height: 30px; }
+  .app.mobile .divider { flex: 0 0 1px; }
+
+  /* --- barre d'actions basse */
+  .mobile-bar {
+    flex: 0 0 auto;
+    display: flex;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .mobile-bar button {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 52px;
+    background: transparent;
+    border: 0;
+    border-right: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .mobile-bar button:last-child { border-right: 0; }
+  .mobile-bar button.active { color: #fff; background: var(--accent-dim); }
+  .mobile-bar .glyph { font-size: 17px; line-height: 1; color: var(--text); }
+  .mobile-bar button.active .glyph { color: #fff; }
+  .mobile-bar .pip {
+    position: absolute;
+    top: 7px;
+    right: 22%;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 9.5px;
+    line-height: 15px;
+    font-weight: 700;
+  }
+
+  /* --- confort tactile dans les panneaux */
+  .app.mobile .panel-body { padding: 12px 12px 28px; }
+  .app.mobile .catalog-item { padding: 10px; }
+  .app.mobile .zone-btn { padding: 10px 9px; }
+  .app.mobile .check { padding: 11px 10px; }
+  .app.mobile .input { height: 36px; font-size: 16px; } /* 16px : évite le zoom auto d'iOS */
+  .app.mobile .btn { height: 34px; }
+  .app.mobile .btn.small { height: 30px; }
+
+  /* --- indications à l'écran, réduites pour ne pas masquer le plan */
+  .app.mobile .canvas-hint {
+    font-size: 10.5px;
+    max-width: calc(100% - 24px);
+    padding: 5px 8px;
+  }
+  .app.mobile .canvas-coords { font-size: 10px; bottom: 8px; right: 8px; }
+  .app.mobile .scene3d-toolbar { top: 8px; right: 8px; gap: 6px; }
+  .app.mobile .scene3d-toolbar .seg button { padding: 0 8px; font-size: 11px; }
+
+  .app.mobile .modal { width: 100%; max-height: 88vh; }
+  .app.mobile .notices { width: calc(100% - 24px); }
+  .app.mobile .notice { max-width: none; }
+
+  /* La vue partagée retombe sur une seule zone. */
+  .app.mobile .viewport.split { flex-direction: column; }
+}
+
+/* Écrans très étroits : on récupère quelques pixels de plus. */
+@media (max-width: 400px) {
+  .app.mobile .tool { min-width: 42px; padding: 0 5px; }
+  .app.mobile .mobile-bar button { font-size: 9px; }
 }

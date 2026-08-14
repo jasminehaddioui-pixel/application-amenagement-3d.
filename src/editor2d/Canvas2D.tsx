@@ -17,6 +17,7 @@ import {
 } from '../lib/geometry';
 import { analyseCirculation } from '../lib/circulation';
 import { getBackgroundImage, loadBackgroundImage, onBackgroundImageChange } from './bgImage';
+import { useIsMobile } from '../ui/useMediaQuery';
 
 type DragMode =
   | { kind: 'none' }
@@ -44,6 +45,7 @@ export default function Canvas2D() {
   const selection = useEditor((s) => s.selection);
   const draft = useEditor((s) => s.draft);
   const pendingCatalogId = useEditor((s) => s.pendingCatalogId);
+  const isMobile = useIsMobile();
 
   const store = useEditor;
 
@@ -214,8 +216,59 @@ export default function Canvas2D() {
   }, [size, camera, previewProject, selection, hover, draft, circulation, drag]);
 
   // ------------------------------------------------------------------ pointeurs
+
+  /** Position ecran de chaque doigt / pointeur actif, pour le pincement. */
+  const pointersRef = useRef(new Map<number, Vec2>());
+  /** Etat du geste a deux doigts en cours. */
+  const pinchRef = useRef<{ dist: number; zoom: number; midWorld: Vec2 } | null>(null);
+
+  const localPoint = (e: { clientX: number; clientY: number }): Vec2 => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    return { x: e.clientX - (rect?.left ?? 0), y: e.clientY - (rect?.top ?? 0) };
+  };
+
+  /** Demarre le pincement des qu'un deuxieme doigt touche l'ecran. */
+  const beginPinch = () => {
+    const pts = [...pointersRef.current.values()];
+    if (pts.length < 2) return;
+    const [a, b] = pts;
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    pinchRef.current = {
+      dist: Math.max(1, Math.hypot(b.x - a.x, b.y - a.y)),
+      zoom: camera.zoom,
+      // Le point du plan sous les deux doigts doit rester sous eux.
+      midWorld: screenToWorld(mid, camera, size),
+    };
+    // Un geste a deux doigts annule toute action en cours a un doigt.
+    setDrag({ kind: 'none' });
+  };
+
+  const updatePinch = () => {
+    const pinch = pinchRef.current;
+    const pts = [...pointersRef.current.values()];
+    if (!pinch || pts.length < 2) return;
+    const [a, b] = pts;
+    const dist = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const zoom = Math.max(4, Math.min(600, (pinch.zoom * dist) / pinch.dist));
+    // On replace la camera pour que midWorld retombe exactement sous les doigts :
+    // le pincement zoome et deplace le plan en un seul geste.
+    store.getState().setCamera({
+      zoom,
+      x: pinch.midWorld.x - (mid.x - size.width / 2) / zoom,
+      y: pinch.midWorld.y - (mid.y - size.height / 2) / zoom,
+    });
+  };
+
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    pointersRef.current.set(e.pointerId, localPoint(e));
+    if (pointersRef.current.size === 2) {
+      beginPinch();
+      return;
+    }
+    if (pointersRef.current.size > 2) return;
+
     const raw = toWorld(e);
     const st = store.getState();
 
@@ -330,6 +383,14 @@ export default function Canvas2D() {
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (pointersRef.current.has(e.pointerId)) {
+      pointersRef.current.set(e.pointerId, localPoint(e));
+    }
+    if (pinchRef.current) {
+      updatePinch();
+      return;
+    }
+
     const raw = toWorld(e);
     setCursorWorld(raw);
     const st = store.getState();
@@ -422,6 +483,15 @@ export default function Canvas2D() {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
       /* le pointeur peut avoir deja ete libere */
+    }
+    pointersRef.current.delete(e.pointerId);
+
+    if (pinchRef.current) {
+      // On attend que tous les doigts soient levés : sinon le doigt restant
+      // reprendrait la main au milieu du geste et déplacerait le plan.
+      if (pointersRef.current.size === 0) pinchRef.current = null;
+      setDrag({ kind: 'none' });
+      return;
     }
     finishDrag();
   };
@@ -586,9 +656,11 @@ export default function Canvas2D() {
       case 'pan':
         return 'Glissez pour vous déplacer dans le plan';
       default:
-        return 'Clic : sélectionner — Glisser : déplacer — Alt+glisser : naviguer — Molette : zoomer';
+        return isMobile
+          ? 'Toucher : sélectionner — Glisser : déplacer — Deux doigts : zoomer et naviguer'
+          : 'Clic : sélectionner — Glisser : déplacer — Alt+glisser : naviguer — Molette : zoomer';
     }
-  }, [tool, pendingCatalogId]);
+  }, [tool, pendingCatalogId, isMobile]);
 
   const cursorStyle =
     drag.kind === 'pan' || tool === 'pan'
