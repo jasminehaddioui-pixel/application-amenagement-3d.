@@ -40,6 +40,10 @@ jobs:
 
       - name: Préparation de l'artefact Pages
         uses: actions/configure-pages@v5
+        with:
+          # Active GitHub Pages automatiquement si ce n'est pas déjà fait,
+          # pour éviter d'avoir à le configurer à la main dans les réglages.
+          enablement: true
 
       - name: Envoi de l'artefact
         uses: actions/upload-pages-artifact@v3
