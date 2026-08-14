@@ -1,11 +1,9 @@
 name: Déploiement GitHub Pages
 
+# Le déploiement se fait sur Vercel : ce workflow n'est plus déclenché
+# automatiquement, mais reste disponible à la demande depuis l'onglet Actions
+# si vous souhaitez publier aussi sur GitHub Pages.
 on:
-  push:
-    branches:
-      - main
-      - claude/supermarket-layout-software-yj3xm9
-  # Permet de relancer le déploiement à la main depuis l'onglet Actions.
   workflow_dispatch:
 
 permissions:
