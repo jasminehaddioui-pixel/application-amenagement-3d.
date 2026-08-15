@@ -194,8 +194,8 @@ export function computeAlerts(db: GestionDB, idx: Index = buildIndex(db)): Alert
       level: 'attention',
       category: 'commande',
       title: `${toOrder.length} référence(s) à commander`,
-      detail: 'Le module Achats propose déjà les quantités à partir de vos ventes.',
-      target: { screen: 'achats' },
+      detail: 'Ces références sont sous leur seuil de réapprovisionnement et rien n’est en commande.',
+      target: { screen: 'stocks' },
     });
   }
 

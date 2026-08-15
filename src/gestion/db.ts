@@ -21,7 +21,8 @@ import {
   type GestionDB,
 } from './types';
 
-const DB_KEY = 'gestion.db.v1';
+/** Cle de stockage de la base. Exportee pour la synchronisation entre onglets. */
+export const DB_KEY = 'gestion.db.v1';
 const BACKUP_KEY = (n: number) => `gestion.backup.${n}`;
 const BACKUP_INDEX_KEY = 'gestion.backup.index';
 
