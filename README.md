@@ -238,7 +238,7 @@ la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur
 | Fond de la vente | **4,00 ml de lockers Amazon** côté gauche, un passage de service de 1,97 m, puis une gondole double face adossée au mur droit : c'est le mobilier qui ferme la vente, il n'y a pas de cloison |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
 | Rive gauche | **une gondole continue** du fond de vente jusqu'à la caisse : 5 modules simple face à dos plein là où il n'y a pas de mur, puis 8 muraux, le départ à fond perforé, et 2 modules d'alcools forts |
-| Avant-magasin | **caisse posée en retour contre la rive gauche** : elle ferme la travée d'alcools forts, qui devient un cul-de-sac sous l'œil de l'hôte de caisse — on ne peut pas atteindre les bouteilles sans passer devant lui. **Îlot fruits et légumes au centre, dans l'axe de l'entrée**, dégagé de 1,59 m des gondoles basses. Presse en façade à droite, devant la vitrine |
+| Avant-magasin | **caisse posée en travers, devant la travée d'alcools forts** : elle en barre l'accès, l'hôte de caisse a les bouteilles dans le dos et le client ne peut les atteindre qu'en passant le poste. Passage de 1,50 m entre la caisse et l'îlot. **Îlot fruits et légumes au centre**, dégagé de 1,59 m des gondoles basses. Presse en façade à droite, devant la vitrine |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
 

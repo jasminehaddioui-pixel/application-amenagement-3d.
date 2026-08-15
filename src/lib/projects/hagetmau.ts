@@ -405,7 +405,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 12;
+export const HAGETMAU_REVISION = 13;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
@@ -631,16 +631,17 @@ export function buildHagetmauProject(): Project {
   // ---------------------------------------------------------- avant-magasin
   // L'îlot fruits et légumes est posé au centre, dans l'axe de l'entrée : c'est
   // le premier univers rencontré, et on en fait le tour.
-  const ilotX = entranceX;
+  const ilotX = 12.3;
   const ilotY = 23.9;
   items.push(put(ILOT_FL, ilotX, ilotY, 0));
   zones.push(zone('fruits', ilotX - 1.3, ilotY - 0.8, 2.6, 1.6));
 
-  // Caisse bi-optique posée en retour contre la rive gauche : elle ferme la
-  // travée d'alcools forts, qui devient un cul-de-sac sous l'œil de l'hôte de
-  // caisse. On ne peut pas atteindre les bouteilles sans passer devant lui.
-  items.push(put(CAISSE, SHOP_L + CAISSE.d / 2, YF - 0.05 - CAISSE.w / 2, 90));
-  zones.push(zone('caisse', SHOP_L, YF - 1.6, 2.4, 1.6));
+  // Caisse bi-optique posée EN TRAVERS, devant la travée d'alcools forts : elle
+  // en barre l'accès. L'hôte de caisse a les bouteilles dans le dos, le client
+  // ne peut les atteindre qu'en passant le poste. Le passage entre la caisse et
+  // l'îlot fait 1,50 m.
+  items.push(put(CAISSE, SHOP_L + CAISSE.w / 2, 25.15, 0));
+  zones.push(zone('caisse', SHOP_L, 24.5, 2.0, 1.5));
 
   // La presse occupe l'angle avant droit, devant la vitrine.
   items.push(put(PRESSE, XR - 0.6, YF - 0.3 - PRESSE.d / 2, 0));
