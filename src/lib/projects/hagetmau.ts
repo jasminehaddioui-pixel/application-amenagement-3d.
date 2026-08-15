@@ -692,7 +692,9 @@ export function buildHagetmauProject(): Project {
       // demi-tour d'un fauteuil roulant.
       minAisleWidth: PMR_AISLE,
       showDimensions: true,
-      showCirculation: false,
+      // Les allées sont affichées et contrôlées dès l'ouverture : c'est le
+      // point sur lequel se joue l'accessibilité du magasin.
+      showCirculation: true,
       floorColor: '#d8d3cb',
     },
   };

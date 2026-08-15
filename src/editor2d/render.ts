@@ -53,6 +53,8 @@ interface Palette {
   text: string;
   textMuted: string;
   dim: string;
+  /** Cotes du mobilier : plus discretes que celles du gros oeuvre */
+  dimItem: string;
   accent: string;
   danger: string;
   ok: string;
@@ -71,6 +73,7 @@ const SCREEN: Palette = {
   text: '#e8edf2',
   textMuted: '#93a0ad',
   dim: '#6fb3ff',
+  dimItem: '#9ab0c4',
   accent: '#4c8bf5',
   danger: '#ff5f56',
   ok: '#38c172',
@@ -89,6 +92,7 @@ const PRINT: Palette = {
   text: '#111111',
   textMuted: '#555555',
   dim: '#1a4f9c',
+  dimItem: '#5a6b7d',
   accent: '#1a4f9c',
   danger: '#c0392b',
   ok: '#1e7e34',
@@ -499,25 +503,72 @@ function drawDimensionLine(
   label(ctx, text ?? fmtM(Math.hypot(b.x - a.x, b.y - a.y)), mid, pal, { size: 11, color });
 }
 
-/** Cotations automatiques : longueur de chaque mur, cote exterieur. */
+/**
+ * Cotations automatiques de tout le plan : longueur de chaque mur, largeur et
+ * position de chaque baie, section de chaque poteau, encombrement de chaque
+ * meuble. Chaque famille n'apparait qu'a partir du zoom ou elle reste lisible,
+ * sinon le plan d'ensemble serait illisible.
+ */
 function drawAutoDimensions(ctx: CanvasRenderingContext2D, o: RenderOptions, pal: Palette): void {
   if (!o.project.settings.showDimensions) return;
-  const walls = o.project.floor.walls;
+  const { floor } = o.project;
+  const walls = floor.walls;
   if (!walls.length) return;
+  const zoom = o.camera.zoom;
+
   // Le centre du plan sert a determiner de quel cote deporter la cote.
   const pts: Vec2[] = [];
   walls.forEach((w) => pts.push(w.a, w.b));
   const b = polygonBounds(pts);
   const center: Vec2 = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
 
+  // --- murs
+  const outwardOf = (mid: Vec2, n: Vec2) =>
+    (mid.x - center.x) * n.x + (mid.y - center.y) * n.y >= 0 ? 1 : -1;
+
   for (const w of walls) {
     const L = wallLength(w);
-    if (L < 0.2 || L * o.camera.zoom < 34) continue;
+    if (L < 0.2 || L * zoom < 34) continue;
     const mid: Vec2 = { x: (w.a.x + w.b.x) / 2, y: (w.a.y + w.b.y) / 2 };
     const n = perp(wallDir(w));
-    const outward = (mid.x - center.x) * n.x + (mid.y - center.y) * n.y >= 0 ? 1 : -1;
-    const off = outward * (w.thickness / 2 + 0.45);
+    const off = outwardOf(mid, n) * (w.thickness / 2 + 0.45);
     drawDimensionLine(ctx, w.a, w.b, off, o, pal, pal.dim);
+  }
+
+  // --- baies : largeur cotee au droit du percement
+  for (const op of floor.openings) {
+    if (op.width * zoom < 30) continue;
+    const w = walls.find((x) => x.id === op.wallId);
+    if (!w) continue;
+    const d = wallDir(w);
+    const c = pointOnWall(w, op.offset);
+    const p1 = add(c, mul(d, -op.width / 2));
+    const p2 = add(c, mul(d, op.width / 2));
+    const n = perp(d);
+    const off = -outwardOf(c, n) * (w.thickness / 2 + 0.18);
+    drawDimensionLine(ctx, p1, p2, off, o, pal, pal.accent);
+  }
+
+  // --- poteaux : section, ecrite au plus pres
+  for (const c of floor.columns) {
+    if (Math.max(c.width, c.depth) * zoom < 16) continue;
+    const s = worldToScreen({ x: c.x, y: c.y }, o.camera, o.viewport);
+    const txt =
+      c.shape === 'round'
+        ? `Ø ${fmtM(c.width)}`
+        : `${fmtM(c.width)} × ${fmtM(c.depth)}`;
+    label(ctx, txt, { x: s.x, y: s.y + (c.depth / 2) * zoom + 9 }, pal, {
+      size: 9,
+      color: pal.ok,
+    });
+  }
+
+  // --- mobilier : largeur et profondeur, sur deux cotes adjacents
+  for (const it of floor.items) {
+    const k = itemCorners(it);
+    if (k.length < 4) continue;
+    if (it.width * zoom >= 44) drawDimensionLine(ctx, k[0], k[1], -0.16, o, pal, pal.dimItem);
+    if (it.depth * zoom >= 44) drawDimensionLine(ctx, k[1], k[2], -0.16, o, pal, pal.dimItem);
   }
 }
 

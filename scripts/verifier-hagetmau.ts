@@ -124,6 +124,15 @@ console.log(
   `allée mini         ${circ.minWidth !== null ? circ.minWidth.toFixed(2) + ' m' : '—'}   (seuil ${minAisle.toFixed(2)} m)`,
 );
 console.log(`passages étroits   ${circ.narrowCount}`);
+console.log('');
+console.log('les huit passages les plus serrés :');
+for (const g of circ.gaps.slice(0, 8)) {
+  const flag = g.narrow ? '✗' : '✓';
+  console.log(
+    `   ${flag} ${g.width.toFixed(2)} m   ${g.a.label} / ${g.b.label}` +
+      `   (${g.from.x.toFixed(1)} ; ${g.from.y.toFixed(1)})`,
+  );
+}
 for (const g of circ.gaps.filter((x) => x.narrow)) {
   console.log(
     `   ${g.width.toFixed(2)} m  entre ${g.a.label} et ${g.b.label}` +

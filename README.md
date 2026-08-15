@@ -74,7 +74,7 @@ build `npm run build` et le dossier de publication `dist`.
 | Portes vitrées automatiques | devanture de magasin : deux vantaux coulissants qui s'effacent latéralement, rail au-dessus, passage libre sur toute la largeur de la baie |
 | Poteaux | section rectangulaire ou circulaire |
 | Zones | polygones nommés et colorés, surface calculée |
-| Cotations | cotations manuelles + **cotations automatiques** de chaque mur |
+| Cotations | cotations manuelles + **cotation automatique de tout le plan** : longueur de chaque mur, largeur de chaque baie, section de chaque poteau, largeur et profondeur de chaque meuble. Chaque famille n'apparaît qu'au zoom où elle reste lisible, de sorte que la vue d'ensemble ne se noie pas sous les chiffres |
 
 - **Grille** au pas réglable et **aimantation** (grille, extrémités et milieux de murs,
   sommets de zones, coins d'objets, projection sur l'axe d'un mur).
@@ -142,7 +142,8 @@ et affichée en permanence.
 ### 7. Circulation
 
 - Mesure automatique de **tous les passages** entre meubles et entre meuble et mur.
-- Affichage de la **largeur de chaque passage** directement sur le plan.
+- Affichage de la **largeur de chaque passage** directement sur le plan, en vert
+  au-dessus du seuil, en rouge en dessous.
 - Les passages inférieurs au seuil réglé (1,50 m pour le projet de référence, seuil
   PMR retenu ; modifiable) sont **signalés en rouge** et listés dans le panneau de
   droite.
@@ -259,6 +260,13 @@ C'est aussi le seuil utilisé par l'analyse de circulation du logiciel.
 | Porte d'entrée automatique | 1,80 m de passage libre, sans seuil ni battant |
 | Portes des bureaux | 0,90 m |
 | Passage le plus étroit du magasin | **1,50 m**, mesuré par le contrôle |
+
+Le contrôle `npm run verifier:hagetmau` liste les huit passages les plus serrés du
+magasin avec leur position, ce qui permet de vérifier point par point que rien ne
+descend sous le seuil. Sur l'implantation actuelle, les huit sont exactement à
+1,50 m : ce sont les trois allées entre gondoles, dont la largeur est calculée pour
+tomber juste au seuil compte tenu des meubles les plus profonds de chaque rive.
+L'affichage des circulations est activé dès l'ouverture du projet.
 
 Pour tenir ces largeurs dans 8,00 m de magasin, **tout le froid positif a été
 regroupé sur la rive droite** : la rive gauche ne porte plus que des muraux de 550 mm
