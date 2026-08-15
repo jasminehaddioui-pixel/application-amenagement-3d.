@@ -128,9 +128,9 @@ const DIVIDER_Y = 7.05;
 const SALES_TOP = DIVIDER_Y + DOUBLE_D_CONST;
 
 // Files de gondoles centrales. Les axes sont calés sur les meubles les plus
-// profonds de chaque rive : armoire positive de 700 à gauche, froid de 786 à
-// droite. Les trois allées sont égales et restent au-dessus du seuil PMR.
-const LEFT_FACE = SHOP_L + 0.7;
+// profonds de chaque rive : rayonnage de 550 à gauche, froid de 786 à droite.
+// Les trois allées sont égales et restent au-dessus du seuil PMR.
+const LEFT_FACE = SHOP_L + MURAL_D_CONST;
 const RIGHT_FACE = XR - 0.786;
 const AISLE = (RIGHT_FACE - LEFT_FACE - 2) / 3; // 1,555
 const RUN_A = LEFT_FACE + AISLE + 0.5;
@@ -295,18 +295,10 @@ const TG_B: Spec = {
   shelves: 4,
 };
 
-// Froid — dossier technique EPTA / Bonnet Névé, offre 260710-6140B
-const EIS_162: Spec = {
-  catalogId: 'froid-negatif',
-  name: 'Frais LS — IARP EIS 162 HP (3 portes)',
-  reference: 'EPTA 260710-6140B rep.1A — 1875 × 786 × 2035, −1/+7 °C',
-  w: 1.875,
-  d: 0.786,
-  h: 2.035,
-  color: '#5b9bd5',
-  shelves: 5,
-};
-
+// Froid — dossier technique EPTA / Bonnet Névé, offre 260710-6140B.
+// Le parc retenu est homogène : quatre meubles positifs de deux portes et
+// trois meubles négatifs de deux portes. Les modèles trois portes du dossier
+// initial ont été abandonnés au profit de gondoles.
 const EIS_112: Spec = {
   catalogId: 'froid-negatif',
   name: 'Frais LS — IARP EIS 112 HP (2 portes)',
@@ -318,11 +310,11 @@ const EIS_112: Spec = {
   shelves: 5,
 };
 
-const MULTIFREEZE: Spec = {
+const MULTIFREEZE_2P: Spec = {
   catalogId: 'froid-negatif',
-  name: 'Surgelés — Multifreeze Plus Efficia 3P',
-  reference: 'EPTA 260710-6140B rep.3 — 2100 × 763 × 2033, −25/−23 °C',
-  w: 2.1,
+  name: 'Surgelés — Multifreeze Plus Efficia 2P',
+  reference: 'EPTA 260710-6140B rep.3, version 2 portes — 1400 × 763 × 2033, −25/−23 °C',
+  w: 1.4,
   d: 0.763,
   h: 2.033,
   color: '#3f7fb8',
@@ -369,16 +361,6 @@ const PRESSE: Spec = {
   shelves: 4,
 };
 
-const METRO_1P: Spec = {
-  catalogId: 'frigo-boissons',
-  name: 'Armoire positive 1 porte (type Metro)',
-  reference: 'Armoire vitrée positive 1 porte — à chiffrer',
-  w: 0.7,
-  d: 0.7,
-  h: 2.0,
-  color: '#4a90c4',
-  shelves: 5,
-};
 
 const GONDOLE_SF: Spec = {
   catalogId: 'gondole-simple',
@@ -423,7 +405,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 10;
+export const HAGETMAU_REVISION = 11;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
@@ -597,31 +579,28 @@ export function buildHagetmauProject(): Project {
     zone('circulation', lockerEnd, DIVIDER_Y, dividerStart - lockerEnd, DOUBLE_D, 'Passage de service'),
   );
 
-  // --- mur droit : tout le froid positif y est regroupé, ce qui libère la rive
-  // gauche et élargit les trois allées. La gaine technique reste contournée.
+  // --- mur droit : tout le froid y est regroupé. Trois meubles négatifs de deux
+  // portes, puis quatre positifs de deux portes, coupés par la gaine technique.
   const surgTop = SALES_TOP + 0.1;
-  let y = runY(items, MULTIFREEZE, XR, 'right', surgTop, 2); // 6 portes surgelés
+  let y = runY(items, MULTIFREEZE_2P, XR, 'right', surgTop, 3); // 6 portes négatives
   zones.push(zone('surgeles', XR - 0.9, surgTop, 0.9, y - surgTop));
   const gaineTop = fromFront(10.0) - 0.55; // 15,50
   const frais1 = y + 0.1;
-  y = runY(items, EIS_162, XR, 'right', frais1, 1); // repère 1A
+  y = runY(items, EIS_112, XR, 'right', frais1, 2);
   zones.push(zone('frais', XR - 0.9, frais1, 0.9, y - frais1));
   const frais2 = gaineTop + 1.1 + 0.1; // reprise après la gaine
-  y = runY(items, EIS_162, XR, 'right', frais2, 1); // repère 1A (2e meuble)
-  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B
-  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 1B)'));
-  // Le dernier module de la file habille le poteau P5, coté à 1,85 m de la
-  // façade sur 50 cm de large.
-  runY(items, MURAL, XR, 'right', 20.45, 4);
+  y = runY(items, EIS_112, XR, 'right', frais2, 2);
+  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (suite)'));
+  // Le linéaire se termine en rayonnage ; l'avant-dernier module habille le
+  // poteau P5, coté à 1,85 m de la façade sur 50 cm de large.
+  runY(items, MURAL, XR, 'right', 19.7, 5);
 
   // --- rive gauche : une gondole continue, du fond de vente jusqu'à la caisse.
   // Le mur de flanc ne commence qu'au droit du mur biais ; au-dessus, la ligne
   // est faite de modules simple face à dos plein, autoportants, qui ferment la
   // vente côté volume libre. Elle coiffe au passage les poteaux P2 et P1.
   let yl = runY(items, GONDOLE_SF, SHOP_L, 'left', 8.2, 5);
-  // L'armoire positive une porte, type Metro, prend place dans cette ligne.
-  yl = runY(items, METRO_1P, SHOP_L, 'left', yl + 0.1, 1);
-  yl = runY(items, MURAL, SHOP_L, 'left', yl + 0.1, 7);
+  yl = runY(items, MURAL, SHOP_L, 'left', yl + 0.1, 8);
   yl = runY(items, MURAL_PERF, SHOP_L, 'left', yl + 0.1, 1); // pâtisserie
   // Les alcools forts terminent la rive, juste derrière la caisse : sous
   // surveillance directe de l'hôte de caisse.
@@ -662,7 +641,7 @@ export function buildHagetmauProject(): Project {
   zones.push(zone('caisse', SHOP_L, YF - 1.7, 2.2, 1.7));
 
   // La presse occupe l'angle avant droit, devant la vitrine.
-  items.push(put(PRESSE, XR - PRESSE.d / 2, YF - 0.3 - PRESSE.w / 2, 90));
+  items.push(put(PRESSE, XR - 0.6, YF - 0.3 - PRESSE.d / 2, 0));
 
   items.push(
     put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 13.9, YF - 0.3, 0),

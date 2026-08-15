@@ -237,7 +237,7 @@ la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur
 | Reste du volume, hors vente implantée | **de la surface de vente non aménagée**, 68 m². Ce n'est pas de la réserve : c'est du volume disponible, comptabilisé à part de la surface exploitée |
 | Fond de la vente | **4,00 ml de lockers Amazon** côté gauche, un passage de service de 1,97 m, puis une gondole double face adossée au mur droit : c'est le mobilier qui ferme la vente, il n'y a pas de cloison |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
-| Rive gauche | **une gondole continue** du fond de vente jusqu'à la caisse : 5 modules simple face à dos plein là où il n'y a pas de mur, l'armoire positive une porte type Metro, 7 muraux, le départ à fond perforé, puis 2 modules d'alcools forts |
+| Rive gauche | **une gondole continue** du fond de vente jusqu'à la caisse : 5 modules simple face à dos plein là où il n'y a pas de mur, puis 8 muraux, le départ à fond perforé, et 2 modules d'alcools forts |
 | Avant-magasin | caisse à gauche de la sortie, **îlot fruits et légumes au centre dans l'axe de l'entrée**, dégagé de 2,59 m des gondoles basses, presse dans l'angle avant droit devant la vitrine, alcools forts juste derrière la caisse |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
@@ -295,14 +295,16 @@ meuble frigorifique.
 | Têtes de gondole h. 2200 | 5 | 4 | +1 |
 | Modules h. 1500 | 4 | 5 | −1 |
 | Lockers Amazon | 4,00 ml | — | selon la consigne |
-| Froid positif | 9 portes (2 × EIS 162, 1 × EIS 112, 1 armoire 1 porte type Metro) | 10 | −1 |
-| Froid négatif | 6 portes (2 Multifreeze) | 6 | conforme |
+| Froid positif | **4 meubles de 2 portes** (EIS 112 HP), soit 8 portes | 10 portes en 12 modèles panachés | parc homogène, 2 portes de moins |
+| Froid négatif | **3 meubles de 2 portes** (Multifreeze 2P), soit 6 portes | 6 portes en 2 meubles de 3 portes | même nombre de portes, meubles plus petits |
 
 Les 5 ml de muraux manquants sont remplacés par des modules simple face à dos plein,
 autoportants : sur la moitié nord de la rive gauche il n'y a pas de mur où s'adosser,
 la ligne ferme elle-même la vente côté volume libre. Côté froid, le deuxième meuble
 2 portes est remplacé par une armoire positive une porte, type Metro, placée dans
-cette même ligne.
+cette même ligne. Le parc froid est ramené à un seul format, le deux portes :
+quatre meubles positifs et trois négatifs, tous sur la rive droite. Le linéaire
+libéré par les anciens meubles trois portes est repris en rayonnage.
 
 **Mise à jour du magasin de référence.** Le projet porte un numéro de révision
 (`HAGETMAU_REVISION`, en tête de `src/lib/projects/hagetmau.ts`). L'application le

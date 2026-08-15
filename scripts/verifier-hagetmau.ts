@@ -111,6 +111,14 @@ const linear = items
   .filter((i) => i.category === 'rayonnage' || i.category === 'froid')
   .reduce((s, i) => s + i.width * (i.catalogId === 'gondole-double' ? 2 : 1), 0);
 
+// Récapitulatif du parc froid, par modèle : c'est le poste le plus cher et le
+// plus souvent repris, il mérite d'être compté à chaque contrôle.
+const froid = new Map<string, number>();
+for (const i of items) {
+  if (i.category !== 'froid') continue;
+  froid.set(i.name, (froid.get(i.name) ?? 0) + 1);
+}
+
 const minAisle = project.settings.minAisleWidth;
 const circ = analyseCirculation(project.floor, minAisle);
 
@@ -120,6 +128,8 @@ console.log(`réserve + locaux   ${area('reserve').toFixed(1)} m²`);
 console.log(`mobilier           ${items.length} meubles`);
 console.log(`linéaire de vente  ${linear.toFixed(2)} ml`);
 console.log(`murs / ouvertures  ${walls.length} / ${openings.length}`);
+console.log('parc froid :');
+for (const [nom, n] of [...froid.entries()].sort()) console.log(`   ${n} × ${nom}`);
 console.log(
   `allée mini         ${circ.minWidth !== null ? circ.minWidth.toFixed(2) + ' m' : '—'}   (seuil ${minAisle.toFixed(2)} m)`,
 );
