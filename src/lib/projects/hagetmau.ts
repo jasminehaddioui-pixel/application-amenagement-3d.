@@ -405,7 +405,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 11;
+export const HAGETMAU_REVISION = 12;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
@@ -622,7 +622,7 @@ export function buildHagetmauProject(): Project {
   // la façade. La file A s'arrête plus tôt pour laisser 1,50 m devant l'îlot.
   const lowTop = 17.75;
   const lowEnd = gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 3);
-  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 1);
+  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 2);
   zones.push(zone('promo', RUN_A - 0.5, lowTop, RUN_B - RUN_A + 1, lowEnd - lowTop, 'Gondoles basses'));
   zones.push(
     zone('circulation', SHOP_L, highEnd, XR - SHOP_L, lowTop - highEnd, 'Allée transversale'),
@@ -631,14 +631,16 @@ export function buildHagetmauProject(): Project {
   // ---------------------------------------------------------- avant-magasin
   // L'îlot fruits et légumes est posé au centre, dans l'axe de l'entrée : c'est
   // le premier univers rencontré, et on en fait le tour.
-  const ilotX = 12.3;
+  const ilotX = entranceX;
   const ilotY = 23.9;
   items.push(put(ILOT_FL, ilotX, ilotY, 0));
   zones.push(zone('fruits', ilotX - 1.3, ilotY - 0.8, 2.6, 1.6));
 
-  // Caisse bi-optique à gauche de la sortie, adossée à la rive gauche.
-  items.push(put(CAISSE, SHOP_L + CAISSE.w / 2, YF - 0.3 - CAISSE.d / 2, 0));
-  zones.push(zone('caisse', SHOP_L, YF - 1.7, 2.2, 1.7));
+  // Caisse bi-optique posée en retour contre la rive gauche : elle ferme la
+  // travée d'alcools forts, qui devient un cul-de-sac sous l'œil de l'hôte de
+  // caisse. On ne peut pas atteindre les bouteilles sans passer devant lui.
+  items.push(put(CAISSE, SHOP_L + CAISSE.d / 2, YF - 0.05 - CAISSE.w / 2, 90));
+  zones.push(zone('caisse', SHOP_L, YF - 1.6, 2.4, 1.6));
 
   // La presse occupe l'angle avant droit, devant la vitrine.
   items.push(put(PRESSE, XR - 0.6, YF - 0.3 - PRESSE.d / 2, 0));

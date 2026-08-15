@@ -238,7 +238,7 @@ la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur
 | Fond de la vente | **4,00 ml de lockers Amazon** côté gauche, un passage de service de 1,97 m, puis une gondole double face adossée au mur droit : c'est le mobilier qui ferme la vente, il n'y a pas de cloison |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
 | Rive gauche | **une gondole continue** du fond de vente jusqu'à la caisse : 5 modules simple face à dos plein là où il n'y a pas de mur, puis 8 muraux, le départ à fond perforé, et 2 modules d'alcools forts |
-| Avant-magasin | caisse à gauche de la sortie, **îlot fruits et légumes au centre dans l'axe de l'entrée**, dégagé de 2,59 m des gondoles basses, presse dans l'angle avant droit devant la vitrine, alcools forts juste derrière la caisse |
+| Avant-magasin | **caisse posée en retour contre la rive gauche** : elle ferme la travée d'alcools forts, qui devient un cul-de-sac sous l'œil de l'hôte de caisse — on ne peut pas atteindre les bouteilles sans passer devant lui. **Îlot fruits et légumes au centre, dans l'axe de l'entrée**, dégagé de 1,59 m des gondoles basses. Presse en façade à droite, devant la vitrine |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
 
@@ -293,7 +293,7 @@ meuble frigorifique.
 | Gondole alcools forts | 2 modules | — | poste nouveau |
 | Modules centraux h. 2200 | 9 (8 en files + 1 au fond) | 8 | +1 |
 | Têtes de gondole h. 2200 | 5 | 4 | +1 |
-| Modules h. 1500 | 4 | 5 | −1 |
+| Modules h. 1500 | 5 (2 en file A, 3 en file B) | 5 | conforme |
 | Lockers Amazon | 4,00 ml | — | selon la consigne |
 | Froid positif | **4 meubles de 2 portes** (EIS 112 HP), soit 8 portes | 10 portes en 12 modèles panachés | parc homogène, 2 portes de moins |
 | Froid négatif | **3 meubles de 2 portes** (Multifreeze 2P), soit 6 portes | 6 portes en 2 meubles de 3 portes | même nombre de portes, meubles plus petits |
