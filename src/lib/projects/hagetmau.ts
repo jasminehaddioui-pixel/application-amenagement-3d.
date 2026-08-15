@@ -416,12 +416,20 @@ const RACK: Spec = {
 export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
 
 /**
- * Identifiant du projet de référence. Il change chaque fois que le magasin est
- * remonté d'après un nouveau document. L'application s'en sert pour repérer
- * qu'une copie enregistrée dans le navigateur est périmée et ouvrir la version
- * à jour à la place — l'ancienne reste dans la liste des projets.
+ * Révision du magasin de référence. À INCRÉMENTER À CHAQUE FOIS que ce fichier
+ * change le plan : l'application compare cette valeur à celle de la copie
+ * enregistrée dans le navigateur et rouvre la version à jour quand elle est
+ * plus récente. Sans cela, un visiteur qui a déjà ouvert l'application se voit
+ * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
+ * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_ID = 'hagetmau-batiment-complet';
+export const HAGETMAU_REVISION = 9;
+
+/** Identifiant du projet de référence, porteur de sa révision. */
+export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
+
+/** Préfixe commun à toutes les révisions, pour repérer une copie périmée. */
+export const HAGETMAU_PREFIX = 'hagetmau-';
 
 export function buildHagetmauProject(): Project {
   const walls: Wall[] = [];

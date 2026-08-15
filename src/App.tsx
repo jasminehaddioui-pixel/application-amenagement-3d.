@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useEditor, type ViewMode } from './state/store';
+import { referenceWasRefreshed, useEditor, type ViewMode } from './state/store';
 import Toolbar from './ui/Toolbar';
 import LeftPanel from './ui/LeftPanel';
 import PropertiesPanel from './ui/PropertiesPanel';
@@ -33,6 +33,18 @@ export default function App() {
   const [busy, setBusy] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
+
+  // Une copie périmée du magasin de référence a été remplacée au démarrage :
+  // on le dit, sinon on croit consulter une version qu'on n'a pas.
+  useEffect(() => {
+    if (referenceWasRefreshed) {
+      store.getState().notify(
+        'Le magasin de référence a été mis à jour : la version à jour est ouverte. Votre copie précédente reste dans « Projets ».',
+        'success',
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // La vue partagee 2D+3D n'a pas de sens sur un ecran de telephone.
   useEffect(() => {

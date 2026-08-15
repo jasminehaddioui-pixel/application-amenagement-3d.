@@ -304,6 +304,15 @@ la ligne ferme elle-même la vente côté volume libre. Côté froid, le deuxiè
 2 portes est remplacé par une armoire positive une porte, type Metro, placée dans
 cette même ligne.
 
+**Mise à jour du magasin de référence.** Le projet porte un numéro de révision
+(`HAGETMAU_REVISION`, en tête de `src/lib/projects/hagetmau.ts`). L'application le
+compare à celui de la copie enregistrée dans le navigateur : si la copie est plus
+ancienne, elle ouvre la version à jour et le signale. Sans ce mécanisme, un visiteur
+qui a déjà ouvert l'application se verrait resservir indéfiniment l'ancien plan,
+quelle que soit la mise en ligne. **Ce numéro doit être incrémenté à chaque fois que
+le plan de référence change.** La copie précédente n'est pas effacée : elle reste dans
+la liste des projets.
+
 **Contrôle mécanique.** `npm run verifier:hagetmau` reconstruit le bâtiment et vérifie
 qu'aucun meuble ne chevauche un autre meuble ou la coque, que chaque ouverture tient
 dans son mur, qu'aucune allée client ne descend sous le seuil PMR de 1,50 m et

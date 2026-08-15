@@ -124,13 +124,33 @@ export function visibleWorld(cam: Camera2D, vp: Viewport) {
 
 // ------------------------------------------------------------------ helpers
 
+/**
+ * Emprises des etiquettes deja posees sur l'image courante. Un plan charge —
+ * cotes de mobilier, largeurs d'allees, noms de zones — produit vite plus de
+ * texte que la place disponible, surtout sur un ecran de telephone. Les
+ * etiquettes secondaires sont donc supprimees quand elles recouvriraient une
+ * etiquette deja placee, plutot que de se superposer et rendre tout illisible.
+ */
+let labelBoxes: Array<[number, number, number, number]> = [];
+
+function resetLabels(): void {
+  labelBoxes = [];
+}
+
 function label(
   ctx: CanvasRenderingContext2D,
   text: string,
   at: Vec2,
   pal: Palette,
-  opts: { size?: number; bg?: string; color?: string; align?: CanvasTextAlign } = {},
-): void {
+  opts: {
+    size?: number;
+    bg?: string;
+    color?: string;
+    align?: CanvasTextAlign;
+    /** Etiquette secondaire : escamotee si elle en recouvre une autre. */
+    secondary?: boolean;
+  } = {},
+): boolean {
   const size = opts.size ?? 12;
   ctx.save();
   ctx.font = `${size}px "Segoe UI", system-ui, -apple-system, sans-serif`;
@@ -140,11 +160,26 @@ function label(
   const padX = 4;
   const padY = 3;
   const bx = opts.align === 'left' ? at.x - padX : at.x - w / 2 - padX;
+  const by = at.y - size / 2 - padY;
+  const bw = w + padX * 2;
+  const bh = size + padY * 2;
+
+  if (opts.secondary) {
+    for (const [x0, y0, x1, y1] of labelBoxes) {
+      if (bx < x1 && x0 < bx + bw && by < y1 && y0 < by + bh) {
+        ctx.restore();
+        return false;
+      }
+    }
+  }
+  labelBoxes.push([bx, by, bx + bw, by + bh]);
+
   ctx.fillStyle = opts.bg ?? (pal === SCREEN ? 'rgba(18,22,28,0.82)' : 'rgba(255,255,255,0.88)');
-  ctx.fillRect(bx, at.y - size / 2 - padY, w + padX * 2, size + padY * 2);
+  ctx.fillRect(bx, by, bw, bh);
   ctx.fillStyle = opts.color ?? pal.text;
   ctx.fillText(text, at.x, at.y);
   ctx.restore();
+  return true;
 }
 
 function polyPath(ctx: CanvasRenderingContext2D, pts: Vec2[], cam: Camera2D, vp: Viewport): void {
@@ -286,7 +321,11 @@ function drawZone(ctx: CanvasRenderingContext2D, z: Zone, o: RenderOptions, pal:
   const c = worldToScreen(polygonCentroid(z.points), cam, vp);
   const area = polygonArea(z.points);
   label(ctx, z.name, { x: c.x, y: c.y - 8 }, pal, { size: 13, color: pal.text });
-  label(ctx, fmtM2(area), { x: c.x, y: c.y + 10 }, pal, { size: 11, color: pal.textMuted });
+  label(ctx, fmtM2(area), { x: c.x, y: c.y + 10 }, pal, {
+    size: 11,
+    color: pal.textMuted,
+    secondary: true,
+  });
 }
 
 /**
@@ -383,7 +422,11 @@ function drawWall(ctx: CanvasRenderingContext2D, w: Wall, o: RenderOptions, pal:
 
     if (op.existing) {
       const sc = worldToScreen(c, cam, vp);
-      label(ctx, 'existant', { x: sc.x, y: sc.y - 14 }, pal, { size: 9, color: pal.ok });
+      label(ctx, 'existant', { x: sc.x, y: sc.y - 14 }, pal, {
+        size: 9,
+        color: pal.ok,
+        secondary: true,
+      });
     }
   }
 }
@@ -444,7 +487,7 @@ function drawItem(ctx: CanvasRenderingContext2D, it: Item, o: RenderOptions, pal
 
   const c = worldToScreen({ x: it.x, y: it.y }, cam, vp);
   if (it.width * cam.zoom > 46 && it.depth * cam.zoom > 18) {
-    label(ctx, it.name, c, pal, { size: 10, color: pal.text });
+    label(ctx, it.name, c, pal, { size: 10, color: pal.text, secondary: true });
   }
 }
 
@@ -458,6 +501,7 @@ function drawDimensionLine(
   pal: Palette,
   color = pal.dim,
   text?: string,
+  secondary = false,
 ): void {
   const { camera: cam, viewport: vp } = o;
   const d = norm(sub(b, a));
@@ -500,7 +544,11 @@ function drawDimensionLine(
   ctx.restore();
 
   const mid = { x: (sa.x + sb.x) / 2, y: (sa.y + sb.y) / 2 };
-  label(ctx, text ?? fmtM(Math.hypot(b.x - a.x, b.y - a.y)), mid, pal, { size: 11, color });
+  label(ctx, text ?? fmtM(Math.hypot(b.x - a.x, b.y - a.y)), mid, pal, {
+    size: 11,
+    color,
+    secondary,
+  });
 }
 
 /**
@@ -546,7 +594,7 @@ function drawAutoDimensions(ctx: CanvasRenderingContext2D, o: RenderOptions, pal
     const p2 = add(c, mul(d, op.width / 2));
     const n = perp(d);
     const off = -outwardOf(c, n) * (w.thickness / 2 + 0.18);
-    drawDimensionLine(ctx, p1, p2, off, o, pal, pal.accent);
+    drawDimensionLine(ctx, p1, p2, off, o, pal, pal.accent, undefined, true);
   }
 
   // --- poteaux : section, ecrite au plus pres
@@ -560,6 +608,7 @@ function drawAutoDimensions(ctx: CanvasRenderingContext2D, o: RenderOptions, pal
     label(ctx, txt, { x: s.x, y: s.y + (c.depth / 2) * zoom + 9 }, pal, {
       size: 9,
       color: pal.ok,
+      secondary: true,
     });
   }
 
@@ -567,8 +616,12 @@ function drawAutoDimensions(ctx: CanvasRenderingContext2D, o: RenderOptions, pal
   for (const it of floor.items) {
     const k = itemCorners(it);
     if (k.length < 4) continue;
-    if (it.width * zoom >= 44) drawDimensionLine(ctx, k[0], k[1], -0.16, o, pal, pal.dimItem);
-    if (it.depth * zoom >= 44) drawDimensionLine(ctx, k[1], k[2], -0.16, o, pal, pal.dimItem);
+    if (it.width * zoom >= 44) {
+      drawDimensionLine(ctx, k[0], k[1], -0.16, o, pal, pal.dimItem, undefined, true);
+    }
+    if (it.depth * zoom >= 44) {
+      drawDimensionLine(ctx, k[1], k[2], -0.16, o, pal, pal.dimItem, undefined, true);
+    }
   }
 }
 
@@ -602,7 +655,9 @@ function drawCirculation(ctx: CanvasRenderingContext2D, o: RenderOptions, pal: P
     }
     ctx.restore();
     const mid = { x: (sa.x + sb.x) / 2, y: (sa.y + sb.y) / 2 };
-    label(ctx, fmtM(g.width), mid, pal, { size: 11, color });
+    // Un passage trop étroit est un avertissement : son étiquette passe avant
+    // toutes les autres et ne s'escamote jamais.
+    label(ctx, fmtM(g.width), mid, pal, { size: 11, color, secondary: !g.narrow });
   }
 }
 
@@ -786,6 +841,7 @@ export function renderPlan(ctx: CanvasRenderingContext2D, o: RenderOptions): voi
   ctx.save();
   ctx.fillStyle = pal.bg;
   ctx.fillRect(0, 0, vp.width, vp.height);
+  resetLabels();
 
   drawGrid(ctx, o, pal);
   drawBackground(ctx, o);

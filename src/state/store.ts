@@ -30,7 +30,12 @@ import {
   wallLength,
 } from '../lib/geometry';
 import type { GeneratedLayout } from '../lib/autoLayout';
-import { buildHagetmauProject, HAGETMAU_ID, HAGETMAU_NAME } from '../lib/projects/hagetmau';
+import {
+  buildHagetmauProject,
+  HAGETMAU_ID,
+  HAGETMAU_NAME,
+  HAGETMAU_PREFIX,
+} from '../lib/projects/hagetmau';
 import {
   createProject,
   loadProject,
@@ -180,6 +185,13 @@ interface EditorState {
   deleteCurrent: () => void;
 }
 
+/**
+ * Vrai quand l'application a dû remplacer une copie périmée du magasin de
+ * référence au démarrage. L'interface le signale à l'ouverture, pour que
+ * personne ne reste devant un plan qu'il croit à jour.
+ */
+export let referenceWasRefreshed = false;
+
 function initialProject(): Project {
   const id = lastProjectId();
   if (id) {
@@ -187,7 +199,9 @@ function initialProject(): Project {
     // Une copie périmée du magasin de référence, laissée dans le navigateur par
     // une visite précédente, ne doit pas masquer la version à jour : on ouvre la
     // nouvelle. L'ancienne reste accessible dans la liste des projets.
-    const stale = p != null && p.name === HAGETMAU_NAME && p.id !== HAGETMAU_ID;
+    const isReference = p != null && (p.id.startsWith(HAGETMAU_PREFIX) || p.name === HAGETMAU_NAME);
+    const stale = isReference && p.id !== HAGETMAU_ID;
+    if (stale) referenceWasRefreshed = true;
     if (p && !stale) return p;
   }
   // Premier lancement : on ouvre directement le magasin de Hagetmau, monté a
