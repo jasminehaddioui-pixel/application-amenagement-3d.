@@ -77,6 +77,9 @@ const ROOMS: Array<[number, number, string, ZoneCategory]> = [
   [12.25, 16.4, 'Laboratoire', 'autre'],
 ];
 
+/** Profondeur hors tout d'un mural simple face (devis RAY-ORG). */
+const MURAL_D_CONST = 0.55;
+
 /** Aile gauche : 8,00 m de large, refendue du magasin. */
 const WING_R = 8.2; // nu droit de l'aile
 const SHOP_L = 8.4; // nu gauche du magasin
@@ -86,9 +89,19 @@ const WING_END = 12.0; // fond du dégagement, avant le mur biais
 
 /** Magasin : 8,00 × 23,20 (relevé). */
 const YF = BACK_FACE + 23.2; // 26,05 — façade sur rue
-const SALES_DEPTH = 16.0; // cote 1600 du relevé
-const SALES_TOP = YF - SALES_DEPTH; // 10,05 — nu vente du refend
-const PART_Y = SALES_TOP - WALL / 2; // 9,95 — axe du refend
+
+/**
+ * Le relevé posait le refend à 16,00 m de la façade. Les arrières sont
+ * largement dimensionnés — bandeau de locaux, deux réserves dans l'aile, trois
+ * remises — et la réserve du magasin n'a pas besoin de 7,00 m de profondeur.
+ * On la ramène à 4,00 m et on rend les 3,00 m à la vente : les allées y gagnent
+ * en longueur, et l'avant-magasin la place de manœuvre exigée pour un fauteuil.
+ * Les poteaux P2 et P4, qui portaient l'ancien refend, restent en place et sont
+ * habillés par le mobilier.
+ */
+const RESERVE_DEPTH = 4.0;
+const PART_Y = BACK_FACE + RESERVE_DEPTH - WALL / 2; // 6,95 — axe du refend
+const SALES_TOP = PART_Y + WALL / 2; // 7,05 — nu vente du refend
 
 const EXT_W = XR + WALL; // 16,60 hors œuvre
 const EXT_L = YF + WALL; // 26,25 hors œuvre
@@ -96,18 +109,33 @@ const EXT_L = YF + WALL; // 26,25 hors œuvre
 /** Cotes du relevé, mesurées depuis la façade du magasin. */
 const fromFront = (d: number) => YF - d;
 
+/**
+ * ACCESSIBILITÉ (arrêté du 8 décembre 2014, ERP existants)
+ *  - allée de circulation : 1,20 m minimum. On retient 1,50 m, largeur qui
+ *    permet à un fauteuil de croiser un client et de faire demi-tour sur place,
+ *    et qui sert de seuil à l'analyse de circulation du logiciel ;
+ *  - allées structurantes (tête de gondoles et transversale) : 1,80 m ;
+ *  - porte d'entrée : 1,80 m de passage libre, sans seuil ni battant ;
+ *  - portes intérieures : 0,90 m, 1,20 m pour les chambres froides ;
+ *  - avant-magasin dégagé sur plus de 3,50 m devant la caisse.
+ */
+const PMR_AISLE = 1.5;
+const PMR_MAIN_AISLE = 1.8;
+
 // Files de gondoles centrales. Les axes sont calés sur les meubles les plus
-// profonds de chaque rive (froid 786 mm des deux côtés) : trois allées égales.
-const LEFT_FACE = SHOP_L + 0.786;
+// profonds de chaque rive : muraux de 550 à gauche, froid de 786 à droite. Tout
+// le froid positif est donc regroupé sur la rive droite, ce qui rend 23 cm à
+// chacune des trois allées et les fait passer au-dessus du seuil PMR.
+const LEFT_FACE = SHOP_L + MURAL_D_CONST;
 const RIGHT_FACE = XR - 0.786;
-const AISLE = (RIGHT_FACE - LEFT_FACE - 2) / 3; // 1,476
+const AISLE = (RIGHT_FACE - LEFT_FACE - 2) / 3; // 1,555
 const RUN_A = LEFT_FACE + AISLE + 0.5;
 const RUN_B = RUN_A + 1 + AISLE;
 
 const MODULE = 1.0; // module de gondole (devis RAY-ORG)
 // Le long de la file, une tête de gondole occupe sa LARGEUR (1,03 ml au devis).
 const TG_LEN = 1.03;
-const MURAL_D = 0.55; // profondeur hors tout d'un mural simple face
+const MURAL_D = MURAL_D_CONST;
 const DOUBLE_D = 1.0; // profondeur hors tout d'une gondole double face
 
 // ---------------------------------------------------------------- fabriques
@@ -482,7 +510,7 @@ export function buildHagetmauProject(): Project {
   // ------------------------------------------------------ réserve du magasin
   const partition = wall({ x: SHOP_L, y: PART_Y }, { x: XR, y: PART_Y }, 'wall', WALL);
   walls.push(partition);
-  const serviceDoorX = 9.95; // porte de service de 1,50 m (relevé)
+  const serviceDoorX = 9.75; // porte de service de 1,50 m (relevé)
   openings.push(door(partition.id, serviceDoorX - SHOP_L, 1.5));
   zones.push(zone('reserve', SHOP_L, BACK_FACE, XR - SHOP_L, PART_Y - h - BACK_FACE, 'Réserve magasin'));
 
@@ -529,30 +557,35 @@ export function buildHagetmauProject(): Project {
   // -------------------------------------------------------- surface de vente
   zones.push(zone('vente', SHOP_L, SALES_TOP, XR - SHOP_L, YF - SALES_TOP));
 
-  // --- fond de vente : lockers Amazon puis muraux, en dégageant le poteau P4
-  runX(items, LOCKER, SALES_TOP, 'top', 10.9, 2);
-  runX(items, MURAL, SALES_TOP, 'top', 13.5, 2);
+  // --- fond de vente : porte de service, lockers Amazon, muraux. Le bandeau
+  // démarre après le linéaire du mur gauche, qui occupe l'angle.
+  runX(items, LOCKER, SALES_TOP, 'top', 10.6, 2);
+  runX(items, MURAL, SALES_TOP, 'top', 12.7, 3);
 
-  // --- mur droit : surgelés, gaine technique contournée, frais, muraux
-  const surgTop = SALES_TOP + 0.9;
+  // --- mur droit : tout le froid positif y est regroupé, ce qui libère la rive
+  // gauche et élargit les trois allées. La gaine technique reste contournée.
+  const surgTop = SALES_TOP + 0.65;
   let y = runY(items, MULTIFREEZE, XR, 'right', surgTop, 2); // 6 portes surgelés
   zones.push(zone('surgeles', XR - 0.9, surgTop, 0.9, y - surgTop));
-  const fraisTop = fromFront(10.0) + 0.55 + 0.1; // reprise après la gaine
-  y = runY(items, EIS_162, XR, 'right', fraisTop, 2); // repère 1A — 6 portes
-  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B — 2 portes
-  zones.push(zone('frais', XR - 0.9, fraisTop, 0.9, y - fraisTop));
-  // Les trois derniers muraux habillent le poteau P5 (le module 23,80–24,80
-  // englobe le poteau, coté 1,85 m de la façade sur 50 cm).
-  runY(items, MURAL, XR, 'right', y + 0.1, 3);
+  const gaineTop = fromFront(10.0) - 0.55; // 15,50
+  const frais1 = y + 0.1;
+  y = runY(items, EIS_162, XR, 'right', frais1, 1); // repère 1A
+  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B
+  zones.push(zone('frais', XR - 0.9, frais1, 0.9, y - frais1));
+  const frais2 = gaineTop + 1.1 + 0.1; // reprise après la gaine
+  y = runY(items, EIS_162, XR, 'right', frais2, 1); // repère 1A (2e meuble)
+  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 2
+  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 2)'));
+  // Le dernier module de la file habille le poteau P5, coté à 1,85 m de la
+  // façade sur 50 cm de large.
+  runY(items, MURAL, XR, 'right', 20.45, 4);
 
-  // --- mur gauche : muraux (le 3e habille le poteau P1), frais repère 2,
-  // pâtisserie, puis la fin du linéaire jusqu'à la presse.
-  let yl = runY(items, MURAL, SHOP_L, 'left', SALES_TOP + 0.1, 7);
-  const rep2Top = yl + 0.1;
-  yl = runY(items, EIS_112, SHOP_L, 'left', rep2Top, 1); // repère 2 — 2 portes
-  zones.push(zone('frais', SHOP_L, rep2Top, 0.9, yl - rep2Top, 'Frais (rep. 2)'));
+  // --- mur gauche : une seule file de muraux, ininterrompue. Elle habille au
+  // passage les poteaux P2 (16,00 m) et P1 (13,31 m), tous deux contre le mur.
+  // Le départ est calé à 35 cm du refend pour qu'un module entier vienne
+  // coiffer le poteau P2 plutôt que de tomber à cheval dessus.
+  let yl = runY(items, MURAL, SHOP_L, 'left', SALES_TOP + 0.35, 9);
   yl = runY(items, MURAL_PERF, SHOP_L, 'left', yl + 0.1, 1); // pâtisserie
-  yl = runY(items, MURAL, SHOP_L, 'left', yl + 0.1, 5);
 
   // --- gondoles centrales
   /** Pose une travée : tête de gondole, modules, tête de gondole. */
@@ -568,35 +601,44 @@ export function buildHagetmauProject(): Project {
     return cy + TG_LEN;
   };
 
-  // Les deux travées hautes du devis : 2 files de 4 modules et 4 têtes.
-  const highTop = 12.06;
+  // Allée de tête de 1,80 m derrière les lockers, puis les deux travées hautes
+  // du devis : 2 files de 4 modules et 4 têtes. La tête de la file B habille le
+  // poteau P4, resté en place après le recul du refend.
+  const highTop = SALES_TOP + LOCKER.d + PMR_MAIN_AISLE;
   const highEnd = gondolaRun(RUN_A, highTop, GONDOLE_H, TG_H, 4);
   gondolaRun(RUN_B, highTop, GONDOLE_H, TG_H, 4);
   zones.push(zone('epicerie', RUN_A - 0.5, highTop, RUN_B - RUN_A + 1, highEnd - highTop));
+  zones.push(
+    zone('circulation', SHOP_L, SALES_TOP + LOCKER.d, XR - SHOP_L, PMR_MAIN_AISLE, 'Allée de tête'),
+  );
 
-  // Allée transversale de 1,40 m, puis les travées basses côté façade. Le
-  // premier module de la file A tombe sur le poteau P3 et l'habille.
-  const lowTop = highEnd + 1.4;
-  const lowEnd = gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 2);
+  // Allée transversale de 1,80 m, puis les travées basses côté façade. Le
+  // deuxième module de la file A tombe sur le poteau P3 et l'habille.
+  const lowTop = highEnd + PMR_MAIN_AISLE;
+  const lowEnd = gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 3);
   gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 2);
   zones.push(zone('promo', RUN_A - 0.5, lowTop, RUN_B - RUN_A + 1, lowEnd - lowTop, 'Gondoles basses'));
-  zones.push(zone('circulation', SHOP_L, highEnd, XR - SHOP_L, 1.4, 'Allée transversale'));
+  zones.push(zone('circulation', SHOP_L, highEnd, XR - SHOP_L, PMR_MAIN_AISLE, 'Allée transversale'));
 
   // ---------------------------------------------------------- avant-magasin
-  // L'îlot fruits et légumes est le premier univers rencontré en entrant.
-  items.push(put(ILOT_FL, SHOP_L + 0.2 + ILOT_FL.w / 2, YF - ILOT_FL.d / 2, 0));
+  // La presse prend la fin du linéaire gauche, en retrait des gondoles.
+  items.push(put(PRESSE, SHOP_L + PRESSE.d / 2, yl + 0.1 + PRESSE.w / 2, 90));
+
+  // L'îlot fruits et légumes est le premier univers rencontré en entrant. Il
+  // reste à 20 cm de la façade et laisse plus de 3,50 m de dégagement derrière.
+  items.push(put(ILOT_FL, SHOP_L + 0.2 + ILOT_FL.w / 2, YF - 0.2 - ILOT_FL.d / 2, 0));
   zones.push(zone('fruits', SHOP_L, YF - 2.4, 2.6, 2.4));
 
-  // Presse et caisse encadrent la sortie, à droite de l'entrée.
-  items.push(put(PRESSE, 13.9, YF - PRESSE.d / 2, 0));
-  items.push(put(CAISSE, XR - CAISSE.w / 2, YF - 0.45, 0));
+  // Caisse bi-optique adossée au mur droit, face à la sortie. Le passage entre
+  // la caisse et l'îlot fait 4,40 m : un fauteuil y fait demi-tour sans gêne.
+  items.push(put(CAISSE, XR - CAISSE.w / 2, YF - 0.2 - CAISSE.d / 2, 0));
   zones.push(zone('caisse', XR - 2.2, YF - 1.7, 2.2, 1.7));
 
   items.push(
-    put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 10.85, YF - 0.3, 0),
+    put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 14.3, YF - 0.3, 0),
   );
   items.push(
-    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 13.4, YF - 1.85, 0),
+    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 8.75, 23.7, 0),
   );
   zones.push(zone('entree', entranceX - 0.9, YF - 2.2, 1.8, 2.2));
 
@@ -624,7 +666,9 @@ export function buildHagetmauProject(): Project {
       defaultWallThickness: WALL,
       defaultPartitionThickness: PART,
       gridSize: 0.25,
-      minAisleWidth: 1.4,
+      // Seuil PMR retenu : 1,50 m, largeur qui permet le croisement et le
+      // demi-tour d'un fauteuil roulant.
+      minAisleWidth: PMR_AISLE,
       showDimensions: true,
       showCirculation: false,
       floorColor: '#d8d3cb',

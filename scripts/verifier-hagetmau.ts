@@ -131,6 +131,30 @@ for (const g of circ.gaps.filter((x) => x.narrow)) {
   );
 }
 
+// ------------------------------------------------------------ accessibilité
+// Arrêté du 8 décembre 2014 : une porte desservant un local doit offrir un
+// passage utile d'au moins 0,83 m, ce que donne une largeur nominale de 0,90 m.
+// L'entrée d'un ERP de 5e catégorie doit offrir 0,90 m de passage libre ; on
+// vérifie en plus que la porte automatique de façade dépasse 1,20 m.
+const MIN_DOOR = 0.9;
+for (const o of openings) {
+  if (o.type === 'window') continue;
+  if (o.width < MIN_DOOR - 0.005) {
+    problems.push(`porte trop étroite : ${o.width.toFixed(2)} m (minimum ${MIN_DOOR.toFixed(2)} m)`);
+  }
+}
+const entrance = openings.find((o) => o.type === 'sliding');
+if (!entrance) {
+  problems.push('aucune porte automatique en façade');
+} else if (entrance.width < 1.2 - 0.005) {
+  problems.push(`entrée de ${entrance.width.toFixed(2)} m : moins de 1,20 m de passage libre`);
+}
+const doorWidths = openings.filter((o) => o.type !== 'window').map((o) => o.width);
+console.log(
+  `portes               ${doorWidths.length}, la plus étroite ${Math.min(...doorWidths).toFixed(2)} m` +
+    `   entrée ${entrance ? entrance.width.toFixed(2) + ' m de passage libre' : '—'}`,
+);
+
 if (dressed.length) {
   console.log('');
   console.log(`poteaux habillés   ${dressed.length}`);

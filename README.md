@@ -143,8 +143,9 @@ et affichée en permanence.
 
 - Mesure automatique de **tous les passages** entre meubles et entre meuble et mur.
 - Affichage de la **largeur de chaque passage** directement sur le plan.
-- Les passages inférieurs au seuil réglé (1,40 m par défaut, modifiable) sont
-  **signalés en rouge** et listés dans le panneau de droite.
+- Les passages inférieurs au seuil réglé (1,50 m pour le projet de référence, seuil
+  PMR retenu ; modifiable) sont **signalés en rouge** et listés dans le panneau de
+  droite.
 - Les mesures ignorent les passages qui traverseraient un autre meuble, afin de ne
   retenir que les circulations réelles.
 
@@ -227,27 +228,50 @@ est conservé : l'aménagement se construit autour.
 |---|---|
 | Bandeau de locaux au fond, 2,45 m de profondeur | Groupes froids, sanitaires, C.F. Crèmerie, C.F. Boucherie, laboratoire |
 | Aile gauche, 8,00 m de large, trois travées de 2,70 m entre contreforts | Réserve 1, Réserve 2, dégagement, fermée au sud par le mur biais |
-| Magasin, 8,00 × 23,20 m | réserve de 7,00 m au fond, puis 16,00 m de vente jusqu'à la façade — la cote 1600 du relevé |
+| Magasin, 8,00 × 23,20 m | réserve de 4,00 m au fond, puis 19,00 m de vente jusqu'à la façade |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
-| Total | 16,20 × 25,85 m dans œuvre, 128 m² de vente, 104 m² de réserves et de locaux |
+| Total | 16,20 × 25,85 m dans œuvre, 153,6 m² de vente, 78,4 m² de réserves et de locaux |
+
+**Accessibilité PMR** (arrêté du 8 décembre 2014, ERP existants). Le seuil
+réglementaire d'une circulation intérieure est de 1,20 m ; le plan retient **1,50 m**,
+largeur qui permet à un fauteuil de croiser un client et de faire demi-tour sur place.
+C'est aussi le seuil utilisé par l'analyse de circulation du logiciel.
+
+| | |
+|---|---|
+| Allées entre gondoles | **1,55 m** — les trois sont égales |
+| Allée de tête et allée transversale | **1,80 m** |
+| Porte d'entrée automatique | 1,80 m de passage libre, sans seuil ni battant |
+| Porte de service | 1,50 m |
+| Portes intérieures | 0,90 m, 1,20 m pour les chambres froides |
+| Dégagement devant la caisse | 3,88 m, et 2,68 m entre l'îlot et les gondoles |
+
+Pour tenir ces largeurs dans 8,00 m de magasin, **tout le froid positif a été
+regroupé sur la rive droite** : la rive gauche ne porte plus que des muraux de 550 mm
+au lieu d'un meuble frigorifique de 786, ce qui rend 23 cm à chacune des trois allées.
+Et parce que les arrières sont largement dimensionnés, **la réserve du magasin passe
+de 7,00 à 4,00 m** : les 3,00 m rendus à la vente donnent à l'avant-magasin la place
+de manœuvre exigée pour un fauteuil, et portent la surface de vente de 128 à 153,6 m².
 
 **Traitement des poteaux.** Les poteaux ne coupent plus le linéaire : quand un poteau
 tombe dans l'emprise d'un meuble, le meuble est posé de façon à l'englober — c'est
-l'habillage de poteau, pratique courante en agencement. P1 et P5 sont habillés par un
-mural, P3 par un module de gondole basse. Seule la gaine technique (110 × 70) reste
-contournée : on ne coffre pas une gaine dans un meuble frigorifique.
+l'habillage de poteau, pratique courante en agencement. P1, P2 et P5 sont habillés par
+un mural, P4 par une tête de gondole, P3 par un module de gondole basse. Seule la
+gaine technique (110 × 70) reste contournée : on ne coffre pas une gaine dans un
+meuble frigorifique.
 
-**Ce qui est posé.** 17 modules de muraux, soit 17,00 ml contre 17,12 ml au devis ;
-les 8 modules centraux h. 2200 et leurs 4 têtes, en deux files de 4 ; 4 modules
-h. 1500 et 4 têtes en travée basse ; 10 portes de froid positif et 6 de négatif,
-conformément au dossier EPTA — le plan d'implantation en annonçait 12 + 6, c'est le
-dossier EPTA, plus récent, qui a été suivi.
+**Ce qui est posé.** 16 modules de muraux plus le départ à fond perforé, soit 17,00 ml
+contre 17,12 ml au devis ; les 8 modules centraux h. 2200 et leurs 4 têtes, en deux
+files de 4 ; 5 modules h. 1500 et 4 têtes en travée basse ; 10 portes de froid positif
+et 6 de négatif, conformément au dossier EPTA — le plan d'implantation en annonçait
+12 + 6, c'est le dossier EPTA, plus récent, qui a été suivi.
 
 **Contrôle mécanique.** `npm run verifier:hagetmau` reconstruit le bâtiment et vérifie
 qu'aucun meuble ne chevauche un autre meuble ou la coque, que chaque ouverture tient
-dans son mur, et qu'aucune allée client ne descend sous 1,40 m. Les poteaux sont
-traités à part : un poteau entièrement contenu dans l'emprise d'un meuble est listé
-comme habillé, un recouvrement partiel reste une erreur.
+dans son mur, qu'aucune allée client ne descend sous le seuil PMR de 1,50 m et
+qu'aucune porte ne descend sous 0,90 m. Les poteaux sont traités à part : un poteau
+entièrement contenu dans l'emprise d'un meuble est listé comme habillé, un
+recouvrement partiel reste une erreur.
 
 ## Raccourcis clavier
 
