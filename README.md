@@ -223,19 +223,25 @@ de propriétés. Les murs, poteaux et portes sont marqués « existant » et le 
 est conservé : l'aménagement se construit autour.
 
 **La maquette couvre tout le bâtiment**, pas seulement la surface de vente.
-Les locaux dessinés sur le tirage — chambres froides, laboratoire — appartenaient à
-l'aménagement précédent et ont été déposés : il ne reste que la coque, le mur de la
-réserve, le refend entre l'aile gauche et le magasin, et les deux bureaux.
+Le local est un seul volume : les chambres froides et le laboratoire dessinés sur le
+tirage appartenaient à l'aménagement précédent et ont été déposés. Il ne reste que la
+coque, le mur de la réserve, et les trois murs des bureaux — **ce sont les seules
+cloisons**. En particulier, il n'y a pas de refend entre l'aile gauche et le magasin :
+la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur.
 
 | | |
 |---|---|
 | **Réserve**, bande du fond, 2,45 m de profondeur sur toute la largeur | 39,7 m², c'est le seul local de stockage : c'est là que sont les groupes. Cinq racks lourds adossés au mur du fond, allée de service de 1,35 m devant |
 | **Bureau 1** et **Bureau 2**, dans l'aile gauche | 15,9 et 16,4 m², les seuls autres locaux cloisonnés, conservés tels quels |
-| Reste de l'aile gauche, et fond du magasin | **de la surface de vente non aménagée** — 29,4 m² dans l'aile, 33,6 m² dans le magasin. Ce n'est pas de la réserve : c'est du volume disponible, comptabilisé à part de la surface exploitée |
-| Séparation vente aménagée / fond | **une file de gondoles double face posée en travers**, adossée au mur droit : c'est le mobilier qui fait la cloison. Elle laisse à gauche un passage de service de 1,94 m |
+| Reste du volume, hors vente implantée | **de la surface de vente non aménagée**, 68 m². Ce n'est pas de la réserve : c'est du volume disponible, comptabilisé à part de la surface exploitée |
+| Séparation vente implantée / volume libre | **une file de gondoles double face posée en travers**, adossée au mur droit : c'est le mobilier qui fait la cloison. Elle laisse à gauche un passage de service de 1,94 m |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
-| Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 63 m² de vente encore libre, 39,7 m² de réserve |
+| Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
+
+Le mur de flanc gauche du magasin ne commence qu'au droit du mur biais : au-dessus, la
+vente ouvre sur le volume libre. Les muraux ne sont donc posés qu'à partir de là ;
+plus haut, deux lockers Amazon autoportants tiennent la rive et coiffent le poteau P2.
 
 **Accessibilité PMR** (arrêté du 8 décembre 2014, ERP existants). Le seuil
 réglementaire d'une circulation intérieure est de 1,20 m ; le plan retient **1,50 m**,
@@ -247,7 +253,7 @@ C'est aussi le seuil utilisé par l'analyse de circulation du logiciel.
 | Allées entre gondoles | **1,55 m** — les trois sont égales |
 | Allée de tête et allée transversale | **1,80 m** |
 | Passage de service vers le fond | 1,94 m |
-| Portes de la réserve | deux passages de 1,50 m, un par aile |
+| Portes de la réserve | deux passages de 1,50 m |
 | Porte d'entrée automatique | 1,80 m de passage libre, sans seuil ni battant |
 | Portes des bureaux | 0,90 m |
 | Passage le plus étroit du magasin | **1,50 m**, mesuré par le contrôle |
@@ -257,18 +263,20 @@ regroupé sur la rive droite** : la rive gauche ne porte plus que des muraux de 
 au lieu d'un meuble frigorifique de 786, ce qui rend 23 cm à chacune des trois allées.
 Et parce que la réserve se limite à la bande du fond, la surface de vente exploitée
 occupe 18,00 m sur les 25,85 m du magasin : l'avant-magasin dispose de la place de
-manœuvre exigée pour un fauteuil, et la vente atteint 144 m² — sans compter les 63 m²
-encore libres derrière la file de gondoles et dans l'aile.
+manœuvre exigée pour un fauteuil, et la vente atteint 144 m² — sans compter les 68 m²
+encore libres derrière la file de gondoles.
 
 **Traitement des poteaux.** Les poteaux ne coupent plus le linéaire : quand un poteau
 tombe dans l'emprise d'un meuble, le meuble est posé de façon à l'englober — c'est
-l'habillage de poteau, pratique courante en agencement. P1, P2 et P5 sont habillés par
-un mural, P4 par une tête de gondole, P3 par un module de gondole basse — cinq des six
-éléments de structure. Seule la gaine technique (110 × 70) reste contournée : on ne
-coffre pas une gaine dans un meuble frigorifique.
+l'habillage de poteau, pratique courante en agencement. P5 est habillé par un mural,
+P2 par un locker, P4 par une tête de gondole, P3 par un module de gondole basse. P1
+reste apparent : il tombe dans le volume libre, au-dessus du départ du mur de flanc.
+La gaine technique (110 × 70) est contournée — on ne coffre pas une gaine dans un
+meuble frigorifique.
 
-**Ce qui est posé, et l'écart au devis.** 12 modules de muraux plus le départ à fond
-perforé, soit 13,00 ml contre 17,12 ml chiffrés : 4 ml de moins. En revanche la file
+**Ce qui est posé, et l'écart au devis.** 11 modules de muraux plus le départ à fond
+perforé, soit 12,00 ml contre 17,12 ml chiffrés : 5 ml de moins, faute de mur où les
+adosser. En revanche la file
 qui sert de séparation demande **4 modules double face h. 2200 et 2 têtes de plus** que
 les 8 modules et 4 têtes du devis, puisqu'elle remplace une cloison qui n'existe pas.
 Le reste suit le devis : 5 modules h. 1500 et 4 têtes en travée basse, 10 portes de

@@ -90,8 +90,7 @@ const BAND_Y = YB + BAND_DEPTH + WALL / 2; // 2,75 — axe du mur de réserve
 const BAND_FACE = BAND_Y + WALL / 2; // 2,85 — nu vente
 
 /** Aile gauche : 8,00 m de large, refendue du magasin. */
-const WING_R = 8.2; // nu droit de l'aile
-const SHOP_L = 8.4; // nu gauche du magasin
+const SHOP_L = 8.4; // nu gauche du magasin, sous le mur biais
 const WING_END = 13.1; // le refend rejoint l'angle du mur biais
 
 /** Les deux bureaux, seuls locaux cloisonnés (relevé et DTA). */
@@ -447,11 +446,9 @@ export function buildHagetmauProject(): Project {
   openings.push(door(bandWall.id, 4.0, 1.5));
   openings.push(door(bandWall.id, 12.0, 1.5));
 
-  // Le refend qui sépare l'aile gauche du magasin, sur toute la hauteur du
-  // bâtiment jusqu'à l'angle du mur biais.
-  const wingWall = wall({ x: WING_R + h, y: BAND_Y }, { x: WING_R + h, y: WING_END }, 'wall', WALL);
-  walls.push(wingWall);
-  openings.push(door(wingWall.id, 2.0, 1.5)); // liaison aile / magasin
+  // Il n'y a PAS de refend entre l'aile gauche et le magasin : la ligne visible
+  // à cet endroit sur le relevé est une ligne de cote, pas un mur. Le local est
+  // un seul volume, et la seule cloison hors réserve est celle des bureaux.
 
   // Les deux bureaux. Ce sont les seuls locaux cloisonnés qui subsistent :
   // le tirage montre leur mur haut et leur mur droit, le DTA les nomme.
@@ -481,21 +478,16 @@ export function buildHagetmauProject(): Project {
   });
   for (let i = 0; i < 3; i++) columns.push(buttress(2.88 + i * 3.08));
 
-  // Hors bureaux, l'aile est de la surface de vente : elle n'est simplement pas
-  // encore aménagée. Elle n'est pas comptée dans la surface de vente exploitée.
-  zones.push(zone('autre', XL, BAND_FACE, WING_R - XL, OFF_TOP - h - BAND_FACE, 'Vente non aménagée — aile'));
-  zones.push(
-    zone('autre', OFF_R + h, OFF_TOP - h, WING_R - OFF_R - h, WING_END - OFF_TOP + h, 'Vente non aménagée — aile'),
-  );
   zones.push(zone('autre', XL, OFF_TOP + h, OFF_R - h - XL, OFF_MID - PART / 2 - OFF_TOP - h, 'Bureau 1'));
   zones.push(zone('autre', XL, OFF_MID + PART / 2, OFF_R - h - XL, OFF_BOTTOM - OFF_MID - PART / 2, 'Bureau 2'));
 
-  // ----------------------------------------------- fond du magasin, non aménagé
-  // Entre la réserve et la file de gondoles, c'est encore de la surface de
-  // vente : elle sert de zone de travail en attendant d'être exploitée.
-  zones.push(
-    zone('autre', SHOP_L, BAND_FACE, XR - SHOP_L, DIVIDER_Y - BAND_FACE, 'Vente non aménagée — magasin'),
-  );
+  // ------------------------------------------- le volume libre, non aménagé
+  // Tout ce qui est au sud de la réserve et au nord de la vente implantée est
+  // de la surface de vente : elle n'est simplement pas encore exploitée, et
+  // n'est donc pas comptée dans les mètres carrés de vente.
+  zones.push(zone('autre', XL, BAND_FACE, XR - XL, OFF_TOP - h - BAND_FACE, 'Vente non aménagée'));
+  zones.push(zone('autre', OFF_R + h, OFF_TOP - h, XR - OFF_R - h, SALES_TOP - OFF_TOP + h, 'Vente non aménagée'));
+  zones.push(zone('autre', OFF_R + h, SALES_TOP, SHOP_L - OFF_R - h, WING_END - SALES_TOP, 'Vente non aménagée'));
 
   // ------------------------------------------------- poteaux relevés au plan
   const col = (x: number, y: number, w: number, d: number, name: string) => ({
@@ -580,13 +572,13 @@ export function buildHagetmauProject(): Project {
   // façade sur 50 cm de large.
   runY(items, MURAL, XR, 'right', 21.7, 3);
 
-  // --- mur gauche : une seule file de muraux, ininterrompue. Elle habille au
-  // passage les poteaux P2 (16,00 m) et P1 (13,31 m), tous deux contre le mur.
-  // Le départ est calé pour qu'un module entier vienne coiffer P2 plutôt que de
-  // tomber à cheval dessus.
-  let yl = runY(items, MURAL, SHOP_L, 'left', 8.2, 9);
+  // --- rive gauche. Le mur de flanc du magasin ne commence qu'au droit du mur
+  // biais : au-dessus, la vente ouvre sur le volume libre. Les muraux ne sont
+  // donc posés qu'à partir de là. Plus haut, deux lockers Amazon autoportants
+  // tiennent la rive et coiffent au passage le poteau P2.
+  runY(items, LOCKER, SHOP_L, 'left', 8.2, 2);
+  let yl = runY(items, MURAL, SHOP_L, 'left', WING_END + 0.1, 8);
   yl = runY(items, MURAL_PERF, SHOP_L, 'left', yl + 0.1, 1); // pâtisserie
-  yl = runY(items, LOCKER, SHOP_L, 'left', yl + 0.1, 2);
   // La presse termine le linéaire, face à l'entrée.
   items.push(put(PRESSE, SHOP_L + PRESSE.d / 2, yl + 0.1 + PRESSE.w / 2, 90));
 
@@ -612,8 +604,8 @@ export function buildHagetmauProject(): Project {
 
   // ---------------------------------------------------------- avant-magasin
   // L'îlot fruits et légumes est le premier univers rencontré en entrant.
-  items.push(put(ILOT_FL, SHOP_L + 0.2 + ILOT_FL.w / 2, YF - 0.2 - ILOT_FL.d / 2, 0));
-  zones.push(zone('fruits', SHOP_L, YF - 2.4, 2.6, 2.4));
+  items.push(put(ILOT_FL, 10.0, YF - 0.2 - ILOT_FL.d / 2, 0));
+  zones.push(zone('fruits', 8.8, YF - 1.6, 2.4, 1.6));
 
   // Caisse bi-optique adossée au mur droit, face à la sortie.
   items.push(put(CAISSE, XR - CAISSE.w / 2, YF - 0.2 - CAISSE.d / 2, 0));
@@ -623,7 +615,7 @@ export function buildHagetmauProject(): Project {
     put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 14.3, YF - 0.3, 0),
   );
   items.push(
-    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 8.75, 23.7, 0),
+    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 12.0, 24.4, 0),
   );
   zones.push(zone('entree', entranceX - 0.9, YF - 2.2, 1.8, 2.2));
 
