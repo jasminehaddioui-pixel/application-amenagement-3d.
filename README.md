@@ -236,6 +236,7 @@ la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur
 | Reste du volume, hors vente implantée | **de la surface de vente non aménagée**, 68 m². Ce n'est pas de la réserve : c'est du volume disponible, comptabilisé à part de la surface exploitée |
 | Séparation vente implantée / volume libre | **une file de gondoles double face posée en travers**, adossée au mur droit : c'est le mobilier qui fait la cloison. Elle laisse à gauche un passage de service de 1,94 m |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
+| Avant-magasin | caisse à gauche de la sortie, **îlot fruits et légumes au centre dans l'axe de l'entrée**, presse en façade à droite devant la vitrine, alcools forts sur la rive gauche juste derrière la caisse, sous surveillance de l'hôte de caisse |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
 
@@ -274,14 +275,22 @@ reste apparent : il tombe dans le volume libre, au-dessus du départ du mur de f
 La gaine technique (110 × 70) est contournée — on ne coffre pas une gaine dans un
 meuble frigorifique.
 
-**Ce qui est posé, et l'écart au devis.** 11 modules de muraux plus le départ à fond
-perforé, soit 12,00 ml contre 17,12 ml chiffrés : 5 ml de moins, faute de mur où les
-adosser. En revanche la file
-qui sert de séparation demande **4 modules double face h. 2200 et 2 têtes de plus** que
-les 8 modules et 4 têtes du devis, puisqu'elle remplace une cloison qui n'existe pas.
-Le reste suit le devis : 5 modules h. 1500 et 4 têtes en travée basse, 10 portes de
-froid positif et 6 de négatif conformément au dossier EPTA — le plan d'implantation en
-annonçait 12 + 6, c'est le dossier EPTA, plus récent, qui a été suivi.
+**Ce qui est posé, et l'écart au devis.**
+
+| Poste | Posé | Devis | Écart |
+|---|---|---|---|
+| Muraux h. 2200 | 12 modules + 1 départ à fond perforé | 17,12 ml | −4 ml, faute de mur où les adosser |
+| Gondole alcools forts | 2 modules | — | poste nouveau |
+| Modules centraux h. 2200 | 12 (8 en files + 4 dans la séparation) | 8 | +4 |
+| Têtes de gondole h. 2200 | 6 | 4 | +2 |
+| Modules h. 1500 | 6 | 5 | +1 |
+| Froid positif | 9 portes (2 × EIS 162, 1 × EIS 112, 1 armoire 1 porte type Metro) | 10 | −1 |
+| Froid négatif | 6 portes (2 Multifreeze) | 6 | conforme |
+
+Les modules centraux en plus tiennent à la file qui sert de séparation : elle remplace
+une cloison qui n'existe pas. Ils sont en partie compensés par les 4 ml de muraux en
+moins. Côté froid, le deuxième meuble 2 portes est remplacé par une armoire positive
+une porte, type Metro, qui suffit pour ce linéaire.
 
 **Contrôle mécanique.** `npm run verifier:hagetmau` reconstruit le bâtiment et vérifie
 qu'aucun meuble ne chevauche un autre meuble ou la coque, que chaque ouverture tient

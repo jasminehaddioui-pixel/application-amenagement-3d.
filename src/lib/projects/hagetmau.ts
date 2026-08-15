@@ -370,6 +370,28 @@ const PRESSE: Spec = {
   shelves: 4,
 };
 
+const METRO_1P: Spec = {
+  catalogId: 'frigo-boissons',
+  name: 'Armoire positive 1 porte (type Metro)',
+  reference: 'Armoire vitrée positive 1 porte — à chiffrer',
+  w: 0.7,
+  d: 0.7,
+  h: 2.0,
+  color: '#4a90c4',
+  shelves: 5,
+};
+
+const ALCOOLS: Spec = {
+  catalogId: 'rayonnage-mural',
+  name: 'Gondole alcools forts',
+  reference: 'RAY-ORG DE2026-133 — module 1000, h.2200',
+  w: MODULE,
+  d: MURAL_D_CONST,
+  h: 2.2,
+  color: '#8d6e63',
+  shelves: 5,
+};
+
 const RACK: Spec = {
   catalogId: 'reserve-rack',
   name: 'Rack de réserve',
@@ -566,11 +588,13 @@ export function buildHagetmauProject(): Project {
   const frais2 = gaineTop + 1.1 + 0.1; // reprise après la gaine
   y = runY(items, EIS_162, XR, 'right', frais2, 1); // repère 1A (2e meuble)
   y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B
-  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 2
-  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 1B / 2)'));
-  // Le deuxième module de la file habille le poteau P5, coté à 1,85 m de la
+  // À la place du deuxième 2 portes : une armoire positive une porte, type
+  // Metro, qui suffit pour ce linéaire et rend de la place au rayonnage.
+  y = runY(items, METRO_1P, XR, 'right', y + 0.1, 1);
+  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 1B)'));
+  // L'avant-dernier module de la file habille le poteau P5, coté à 1,85 m de la
   // façade sur 50 cm de large.
-  runY(items, MURAL, XR, 'right', 21.7, 3);
+  runY(items, MURAL, XR, 'right', 20.85, 4);
 
   // --- rive gauche. Le mur de flanc du magasin ne commence qu'au droit du mur
   // biais : au-dessus, la vente ouvre sur le volume libre. Les muraux ne sont
@@ -579,8 +603,9 @@ export function buildHagetmauProject(): Project {
   runY(items, LOCKER, SHOP_L, 'left', 8.2, 2);
   let yl = runY(items, MURAL, SHOP_L, 'left', WING_END + 0.1, 8);
   yl = runY(items, MURAL_PERF, SHOP_L, 'left', yl + 0.1, 1); // pâtisserie
-  // La presse termine le linéaire, face à l'entrée.
-  items.push(put(PRESSE, SHOP_L + PRESSE.d / 2, yl + 0.1 + PRESSE.w / 2, 90));
+  // Les alcools forts terminent la rive gauche, juste derrière la caisse :
+  // sous surveillance directe de l'hôte de caisse.
+  yl = runY(items, ALCOOLS, SHOP_L, 'left', yl + 0.1, 2);
 
   // --- gondoles centrales
   // Allée de tête de 1,80 m devant la file de séparation, puis les deux travées
@@ -594,28 +619,35 @@ export function buildHagetmauProject(): Project {
 
   // Allée transversale, puis les travées basses côté façade. Le deuxième module
   // de la file A tombe sur le poteau P3 et l'habille.
+  // La file B est dégagée de l'entrée et de l'îlot : elle file presque jusqu'à
+  // la façade. La file A s'arrête plus tôt pour laisser 1,50 m devant l'îlot.
   const lowTop = 17.75;
-  const lowEnd = gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 3);
-  gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 2);
+  const lowEnd = gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 4);
+  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 2);
   zones.push(zone('promo', RUN_A - 0.5, lowTop, RUN_B - RUN_A + 1, lowEnd - lowTop, 'Gondoles basses'));
   zones.push(
     zone('circulation', SHOP_L, highEnd, XR - SHOP_L, lowTop - highEnd, 'Allée transversale'),
   );
 
   // ---------------------------------------------------------- avant-magasin
-  // L'îlot fruits et légumes est le premier univers rencontré en entrant.
-  items.push(put(ILOT_FL, 10.0, YF - 0.2 - ILOT_FL.d / 2, 0));
-  zones.push(zone('fruits', 8.8, YF - 1.6, 2.4, 1.6));
+  // L'îlot fruits et légumes est posé au centre, dans l'axe de l'entrée : c'est
+  // le premier univers rencontré, et on en fait le tour.
+  const ilotY = 23.9;
+  items.push(put(ILOT_FL, entranceX, ilotY, 0));
+  zones.push(zone('fruits', entranceX - 1.3, ilotY - 0.8, 2.6, 1.6));
 
-  // Caisse bi-optique adossée au mur droit, face à la sortie.
-  items.push(put(CAISSE, XR - CAISSE.w / 2, YF - 0.2 - CAISSE.d / 2, 0));
-  zones.push(zone('caisse', XR - 2.2, YF - 1.7, 2.2, 1.7));
+  // Caisse bi-optique à gauche de la sortie, adossée au mur de flanc.
+  items.push(put(CAISSE, SHOP_L + CAISSE.w / 2, YF - 0.2 - CAISSE.d / 2, 0));
+  zones.push(zone('caisse', SHOP_L, YF - 1.7, 2.2, 1.7));
+
+  // La presse est en façade à droite, devant la vitrine.
+  items.push(put(PRESSE, XR - PRESSE.w / 2, YF - 0.2 - PRESSE.d / 2, 0));
 
   items.push(
-    put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 14.3, YF - 0.3, 0),
+    put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 13.9, YF - 0.3, 0),
   );
   items.push(
-    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 12.0, 24.4, 0),
+    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 9.9, 23.4, 0),
   );
   zones.push(zone('entree', entranceX - 0.9, YF - 2.2, 1.8, 2.2));
 
