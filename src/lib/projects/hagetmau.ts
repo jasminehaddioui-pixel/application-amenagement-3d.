@@ -324,9 +324,9 @@ const MULTIFREEZE_2P: Spec = {
 const CAISSE: Spec = {
   catalogId: 'meuble-caisse',
   name: 'Meuble caisse bi-optique L.1400',
-  reference: 'TILT — meuble caisse bi-optique L:140',
+  reference: 'TILT — bi-optique, matériel professionnel neuf, 1400 × 1000 × 950',
   w: 1.4,
-  d: 0.9,
+  d: 1.0,
   h: 0.95,
 };
 
@@ -405,7 +405,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 15;
+export const HAGETMAU_REVISION = 16;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;

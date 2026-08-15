@@ -219,7 +219,7 @@ Sources utilisées, par ordre d'autorité :
 | Dossier Technique Amiante n° 25/1412/BARICOS, § 7.1 | confirme la distribution : locaux au fond, réserves en retour à gauche, magasin sur le reste |
 | Plan d'implantation `hagetmau_2` | lockers Amazon, presse, entrée en pignon, largeurs d'allées visées |
 | Devis RAY-ORG n° DE2026-133 | muraux h. 2200 (module 1000, profondeur 550, 17,12 ml), 8 modules centraux double face h. 2200, 4 têtes de gondole 1,03 ml, modules et têtes h. 1500 |
-| Trame devis TILT | caisse bi-optique L 1400, îlot fruits et légumes H 155 de 2 ml |
+| Trame devis TILT | caisse bi-optique, matériel professionnel neuf, 1400 × 1000 × 950 ; îlot fruits et légumes H 155 de 2 ml |
 | Dossier technique EPTA n° 260710-6140B | cotes hors tout exactes du froid : EIS 162 HP (1875 × 786 × 2035), EIS 112 HP (1250 × 786 × 2032), Multifreeze Plus Efficia 3P (2100 × 763 × 2033) |
 
 Chaque meuble porte sa **référence de devis**, visible et modifiable dans le panneau
