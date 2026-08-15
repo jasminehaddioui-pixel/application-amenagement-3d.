@@ -234,9 +234,10 @@ la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur
 | **Réserve**, bande du fond, 2,45 m de profondeur sur toute la largeur | 39,7 m², c'est le seul local de stockage : c'est là que sont les groupes. Cinq racks lourds adossés au mur du fond, allée de service de 1,35 m devant |
 | **Bureau 1** et **Bureau 2**, dans l'aile gauche | 15,9 et 16,4 m², les seuls autres locaux cloisonnés, conservés tels quels |
 | Reste du volume, hors vente implantée | **de la surface de vente non aménagée**, 68 m². Ce n'est pas de la réserve : c'est du volume disponible, comptabilisé à part de la surface exploitée |
-| Séparation vente implantée / volume libre | **une file de gondoles double face posée en travers**, adossée au mur droit : c'est le mobilier qui fait la cloison. Elle laisse à gauche un passage de service de 1,94 m |
+| Fond de la vente | **4,00 ml de lockers Amazon** côté gauche, un passage de service de 1,97 m, puis une gondole double face adossée au mur droit : c'est le mobilier qui ferme la vente, il n'y a pas de cloison |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
-| Avant-magasin | caisse à gauche de la sortie, **îlot fruits et légumes au centre dans l'axe de l'entrée**, presse en façade à droite devant la vitrine, alcools forts sur la rive gauche juste derrière la caisse, sous surveillance de l'hôte de caisse |
+| Rive gauche | **une gondole continue** du fond de vente jusqu'à la caisse : 5 modules simple face à dos plein là où il n'y a pas de mur, l'armoire positive une porte type Metro, 7 muraux, le départ à fond perforé, puis 2 modules d'alcools forts |
+| Avant-magasin | caisse à gauche de la sortie, **îlot fruits et légumes au centre dans l'axe de l'entrée**, dégagé de 2,59 m des gondoles basses, presse dans l'angle avant droit devant la vitrine, alcools forts juste derrière la caisse |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
 
@@ -279,18 +280,21 @@ meuble frigorifique.
 
 | Poste | Posé | Devis | Écart |
 |---|---|---|---|
-| Muraux h. 2200 | 12 modules + 1 départ à fond perforé | 17,12 ml | −4 ml, faute de mur où les adosser |
+| Muraux h. 2200 | 11 modules + 1 départ à fond perforé | 17,12 ml | −5 ml, faute de mur où les adosser |
+| Gondoles simple face à dos plein | 5 modules | — | poste nouveau, remplace les muraux là où il n'y a pas de mur |
 | Gondole alcools forts | 2 modules | — | poste nouveau |
-| Modules centraux h. 2200 | 12 (8 en files + 4 dans la séparation) | 8 | +4 |
-| Têtes de gondole h. 2200 | 6 | 4 | +2 |
-| Modules h. 1500 | 6 | 5 | +1 |
+| Modules centraux h. 2200 | 9 (8 en files + 1 au fond) | 8 | +1 |
+| Têtes de gondole h. 2200 | 5 | 4 | +1 |
+| Modules h. 1500 | 4 | 5 | −1 |
+| Lockers Amazon | 4,00 ml | — | selon la consigne |
 | Froid positif | 9 portes (2 × EIS 162, 1 × EIS 112, 1 armoire 1 porte type Metro) | 10 | −1 |
 | Froid négatif | 6 portes (2 Multifreeze) | 6 | conforme |
 
-Les modules centraux en plus tiennent à la file qui sert de séparation : elle remplace
-une cloison qui n'existe pas. Ils sont en partie compensés par les 4 ml de muraux en
-moins. Côté froid, le deuxième meuble 2 portes est remplacé par une armoire positive
-une porte, type Metro, qui suffit pour ce linéaire.
+Les 5 ml de muraux manquants sont remplacés par des modules simple face à dos plein,
+autoportants : sur la moitié nord de la rive gauche il n'y a pas de mur où s'adosser,
+la ligne ferme elle-même la vente côté volume libre. Côté froid, le deuxième meuble
+2 portes est remplacé par une armoire positive une porte, type Metro, placée dans
+cette même ligne.
 
 **Contrôle mécanique.** `npm run verifier:hagetmau` reconstruit le bâtiment et vérifie
 qu'aucun meuble ne chevauche un autre meuble ou la coque, que chaque ouverture tient

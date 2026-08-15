@@ -128,10 +128,9 @@ const DIVIDER_Y = 7.05;
 const SALES_TOP = DIVIDER_Y + DOUBLE_D_CONST;
 
 // Files de gondoles centrales. Les axes sont calés sur les meubles les plus
-// profonds de chaque rive : muraux de 550 à gauche, froid de 786 à droite. Tout
-// le froid positif est donc regroupé sur la rive droite, ce qui rend 23 cm à
-// chacune des trois allées et les fait passer au-dessus du seuil PMR.
-const LEFT_FACE = SHOP_L + MURAL_D_CONST;
+// profonds de chaque rive : armoire positive de 700 à gauche, froid de 786 à
+// droite. Les trois allées sont égales et restent au-dessus du seuil PMR.
+const LEFT_FACE = SHOP_L + 0.7;
 const RIGHT_FACE = XR - 0.786;
 const AISLE = (RIGHT_FACE - LEFT_FACE - 2) / 3; // 1,555
 const RUN_A = LEFT_FACE + AISLE + 0.5;
@@ -381,6 +380,16 @@ const METRO_1P: Spec = {
   shelves: 5,
 };
 
+const GONDOLE_SF: Spec = {
+  catalogId: 'gondole-simple',
+  name: 'Gondole simple face h.2200 — dos plein',
+  reference: 'RAY-ORG DE2026-133 — module 1000, dos plein (autoportant)',
+  w: MODULE,
+  d: MURAL_D_CONST,
+  h: 2.2,
+  shelves: 7,
+};
+
 const ALCOOLS: Spec = {
   catalogId: 'rayonnage-mural',
   name: 'Gondole alcools forts',
@@ -570,10 +579,14 @@ export function buildHagetmauProject(): Project {
   // par une travée double face posée en travers, adossée au mur droit, qui
   // masque la réserve. Elle laisse à gauche un passage de service de 1,94 m.
   const dividerAxis = DIVIDER_Y + DOUBLE_D / 2;
-  const dividerStart = XR - (2 * TG_LEN + 4 * MODULE);
-  gondolaRun(dividerAxis, dividerStart, GONDOLE_H, TG_H, 4, 'x');
+  // 4,00 ml de lockers Amazon en fond de vente, côté gauche.
+  const lockerEnd = runX(items, LOCKER, DIVIDER_Y + DOUBLE_D, 'bottom', SHOP_L, 4);
+  // Puis la file de gondoles, adossée au mur droit.
+  const dividerStart = XR - (TG_LEN + MODULE);
+  items.push(put(TG_H, dividerStart + TG_LEN / 2, dividerAxis, 0));
+  items.push(put(GONDOLE_H, dividerStart + TG_LEN + MODULE / 2, dividerAxis, 0));
   zones.push(
-    zone('circulation', SHOP_L, DIVIDER_Y, dividerStart - SHOP_L, DOUBLE_D, 'Passage de service'),
+    zone('circulation', lockerEnd, DIVIDER_Y, dividerStart - lockerEnd, DOUBLE_D, 'Passage de service'),
   );
 
   // --- mur droit : tout le froid positif y est regroupé, ce qui libère la rive
@@ -588,23 +601,22 @@ export function buildHagetmauProject(): Project {
   const frais2 = gaineTop + 1.1 + 0.1; // reprise après la gaine
   y = runY(items, EIS_162, XR, 'right', frais2, 1); // repère 1A (2e meuble)
   y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B
-  // À la place du deuxième 2 portes : une armoire positive une porte, type
-  // Metro, qui suffit pour ce linéaire et rend de la place au rayonnage.
-  y = runY(items, METRO_1P, XR, 'right', y + 0.1, 1);
   zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 1B)'));
-  // L'avant-dernier module de la file habille le poteau P5, coté à 1,85 m de la
+  // Le dernier module de la file habille le poteau P5, coté à 1,85 m de la
   // façade sur 50 cm de large.
-  runY(items, MURAL, XR, 'right', 20.85, 4);
+  runY(items, MURAL, XR, 'right', 20.45, 4);
 
-  // --- rive gauche. Le mur de flanc du magasin ne commence qu'au droit du mur
-  // biais : au-dessus, la vente ouvre sur le volume libre. Les muraux ne sont
-  // donc posés qu'à partir de là. Plus haut, deux lockers Amazon autoportants
-  // tiennent la rive et coiffent au passage le poteau P2.
-  runY(items, LOCKER, SHOP_L, 'left', 8.2, 2);
-  let yl = runY(items, MURAL, SHOP_L, 'left', WING_END + 0.1, 8);
+  // --- rive gauche : une gondole continue, du fond de vente jusqu'à la caisse.
+  // Le mur de flanc ne commence qu'au droit du mur biais ; au-dessus, la ligne
+  // est faite de modules simple face à dos plein, autoportants, qui ferment la
+  // vente côté volume libre. Elle coiffe au passage les poteaux P2 et P1.
+  let yl = runY(items, GONDOLE_SF, SHOP_L, 'left', 8.2, 5);
+  // L'armoire positive une porte, type Metro, prend place dans cette ligne.
+  yl = runY(items, METRO_1P, SHOP_L, 'left', yl + 0.1, 1);
+  yl = runY(items, MURAL, SHOP_L, 'left', yl + 0.1, 7);
   yl = runY(items, MURAL_PERF, SHOP_L, 'left', yl + 0.1, 1); // pâtisserie
-  // Les alcools forts terminent la rive gauche, juste derrière la caisse :
-  // sous surveillance directe de l'hôte de caisse.
+  // Les alcools forts terminent la rive, juste derrière la caisse : sous
+  // surveillance directe de l'hôte de caisse.
   yl = runY(items, ALCOOLS, SHOP_L, 'left', yl + 0.1, 2);
 
   // --- gondoles centrales
@@ -622,8 +634,8 @@ export function buildHagetmauProject(): Project {
   // La file B est dégagée de l'entrée et de l'îlot : elle file presque jusqu'à
   // la façade. La file A s'arrête plus tôt pour laisser 1,50 m devant l'îlot.
   const lowTop = 17.75;
-  const lowEnd = gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 4);
-  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 2);
+  const lowEnd = gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 3);
+  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 1);
   zones.push(zone('promo', RUN_A - 0.5, lowTop, RUN_B - RUN_A + 1, lowEnd - lowTop, 'Gondoles basses'));
   zones.push(
     zone('circulation', SHOP_L, highEnd, XR - SHOP_L, lowTop - highEnd, 'Allée transversale'),
@@ -632,16 +644,17 @@ export function buildHagetmauProject(): Project {
   // ---------------------------------------------------------- avant-magasin
   // L'îlot fruits et légumes est posé au centre, dans l'axe de l'entrée : c'est
   // le premier univers rencontré, et on en fait le tour.
+  const ilotX = 12.3;
   const ilotY = 23.9;
-  items.push(put(ILOT_FL, entranceX, ilotY, 0));
-  zones.push(zone('fruits', entranceX - 1.3, ilotY - 0.8, 2.6, 1.6));
+  items.push(put(ILOT_FL, ilotX, ilotY, 0));
+  zones.push(zone('fruits', ilotX - 1.3, ilotY - 0.8, 2.6, 1.6));
 
-  // Caisse bi-optique à gauche de la sortie, adossée au mur de flanc.
-  items.push(put(CAISSE, SHOP_L + CAISSE.w / 2, YF - 0.2 - CAISSE.d / 2, 0));
+  // Caisse bi-optique à gauche de la sortie, adossée à la rive gauche.
+  items.push(put(CAISSE, SHOP_L + CAISSE.w / 2, YF - 0.3 - CAISSE.d / 2, 0));
   zones.push(zone('caisse', SHOP_L, YF - 1.7, 2.2, 1.7));
 
-  // La presse est en façade à droite, devant la vitrine.
-  items.push(put(PRESSE, XR - PRESSE.w / 2, YF - 0.2 - PRESSE.d / 2, 0));
+  // La presse occupe l'angle avant droit, devant la vitrine.
+  items.push(put(PRESSE, XR - PRESSE.d / 2, YF - 0.3 - PRESSE.w / 2, 90));
 
   items.push(
     put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 13.9, YF - 0.3, 0),
