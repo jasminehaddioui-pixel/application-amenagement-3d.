@@ -235,7 +235,7 @@ Sources utilisées, par ordre d'autorité :
 | Relevé manuscrit « HAGETMAU », reporté sur ce même plan | le **magasin** : 800 de large, 2320 de long, 1600 de vente depuis la façade, poteaux à 1390 / 1000 / 538-290 / 160 + 50, gaine 110 × 70, porte de service 150 |
 | Dossier Technique Amiante n° 25/1412/BARICOS, § 7.1 | confirme la distribution : locaux au fond, réserves en retour à gauche, magasin sur le reste |
 | Plan d'implantation `hagetmau_2` | lockers Amazon, presse, entrée en pignon, largeurs d'allées visées |
-| Devis RAY-ORG n° DE2026-133 | muraux h. 2200 (module 1000, profondeur 550, 17,12 ml), 8 modules centraux double face h. 2200, 4 têtes de gondole 1,03 ml, modules et têtes h. 1500 |
+| Devis RAY-ORG n° DE2026-133 | muraux h. 2200 (module 1000, **tablette 1000 × 470**, 17,12 ml), 8 modules centraux double face h. 2200, 4 têtes de gondole 1,03 ml, modules et têtes h. 1500 |
 | Trame devis TILT | caisse bi-optique, matériel professionnel neuf, 1400 × 1000 × 950 ; îlot fruits et légumes H 155 de 2 ml |
 | Dossier technique EPTA n° 260710-6140B | cotes hors tout exactes du froid : EIS 162 HP (1875 × 786 × 2035), EIS 112 HP (1250 × 786 × 2032), Multifreeze Plus Efficia 3P (2100 × 763 × 2033) |
 
@@ -274,13 +274,13 @@ C'est aussi le seuil utilisé par l'analyse de circulation du logiciel.
 
 | | |
 |---|---|
-| Allées entre gondoles | **1,55 m** — les trois sont égales |
+| Allées entre gondoles | **1,62 m** — les trois sont égales |
 | Allée de tête et allée transversale | **1,80 m** |
 | Passage de service vers le fond | 1,94 m |
 | Portes de la réserve | deux passages de 1,50 m |
 | Porte d'entrée automatique | 1,80 m de passage libre, sans seuil ni battant |
 | Portes des bureaux | 0,90 m |
-| Passage le plus étroit du magasin | **1,50 m**, mesuré par le contrôle |
+| Passage le plus étroit du magasin | **1,55 m**, mesuré par le contrôle |
 
 Le contrôle `npm run verifier:hagetmau` liste les huit passages les plus serrés du
 magasin avec leur position, ce qui permet de vérifier point par point que rien ne
@@ -290,8 +290,10 @@ tomber juste au seuil compte tenu des meubles les plus profonds de chaque rive.
 L'affichage des circulations est activé dès l'ouverture du projet.
 
 Pour tenir ces largeurs dans 8,00 m de magasin, **tout le froid positif a été
-regroupé sur la rive droite** : la rive gauche ne porte plus que des muraux de 550 mm
-au lieu d'un meuble frigorifique de 786, ce qui rend 23 cm à chacune des trois allées.
+regroupé sur la rive droite** : la rive gauche ne porte plus que du rayonnage au lieu
+d'un meuble frigorifique de 786 mm. Et le rayonnage est à sa cote réelle — tablette de
+**470 mm utiles**, donc 470 en simple face et 940 en double face, et non les 550 / 1000
+d'un rayonnage standard. Les trois allées atteignent ainsi **1,62 m**.
 Et parce que la réserve se limite à la bande du fond, la surface de vente exploitée
 occupe 18,00 m sur les 25,85 m du magasin : l'avant-magasin dispose de la place de
 manœuvre exigée pour un fauteuil, et la vente atteint 144 m² — sans compter les 68 m²

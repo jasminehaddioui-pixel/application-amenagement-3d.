@@ -63,9 +63,15 @@ const XL = WALL; //  0,20 — mur gauche
 const XR = 16.4; // 16,40 — mur droit
 const YB = WALL; //  0,20 — mur du fond
 
-/** Profondeurs hors tout du mobilier de rayonnage (devis RAY-ORG). */
-const MURAL_D_CONST = 0.55;
-const DOUBLE_D_CONST = 1.0;
+/**
+ * Profondeurs du rayonnage. La tablette fait 470 mm utiles (devis RAY-ORG,
+ * « tablette 1000 × 470 ») : c'est cette cote qui donne la profondeur d'une
+ * gondole simple face. Une gondole double face, faite de deux tablettes dos à
+ * dos, fait donc 940 mm.
+ */
+const SHELF_D = 0.47;
+const MURAL_D_CONST = SHELF_D;
+const DOUBLE_D_CONST = SHELF_D * 2;
 
 /**
  * ÉTAT RÉEL DU LOCAL
@@ -128,13 +134,13 @@ const DIVIDER_Y = 7.05;
 const SALES_TOP = DIVIDER_Y + DOUBLE_D_CONST;
 
 // Files de gondoles centrales. Les axes sont calés sur les meubles les plus
-// profonds de chaque rive : rayonnage de 550 à gauche, froid de 786 à droite.
+// profonds de chaque rive : rayonnage de 470 à gauche, froid de 786 à droite.
 // Les trois allées sont égales et restent au-dessus du seuil PMR.
 const LEFT_FACE = SHOP_L + MURAL_D_CONST;
 const RIGHT_FACE = XR - 0.786;
-const AISLE = (RIGHT_FACE - LEFT_FACE - 2) / 3; // 1,555
-const RUN_A = LEFT_FACE + AISLE + 0.5;
-const RUN_B = RUN_A + 1 + AISLE;
+const AISLE = (RIGHT_FACE - LEFT_FACE - 2 * DOUBLE_D_CONST) / 3;
+const RUN_A = LEFT_FACE + AISLE + DOUBLE_D_CONST / 2;
+const RUN_B = RUN_A + DOUBLE_D_CONST + AISLE;
 
 const MODULE = 1.0; // module de gondole (devis RAY-ORG)
 // Le long de la file, une tête de gondole occupe sa LARGEUR (1,03 ml au devis).
@@ -405,7 +411,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 16;
+export const HAGETMAU_REVISION = 17;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
