@@ -166,6 +166,17 @@ export function analyseCirculation(floor: Floor, minWidth: number, maxGap = 4): 
   const obstacles = buildObstacles(floor);
   const gaps: AisleGap[] = [];
 
+  // Le dégagement derrière un comptoir de caisse est la place de travail de
+  // l'hôte de caisse, pas une allée client : il n'a pas à être jugé à l'aune de
+  // la largeur réglementaire. On écarte donc les mesures dont le milieu tombe
+  // dans une zone « caisse ».
+  const posts = floor.zones.filter((z) => z.category === 'caisse' && z.points.length >= 3);
+  const behindCounter = (from: Vec2, to: Vec2) => {
+    if (!posts.length) return false;
+    const mid: Vec2 = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+    return posts.some((z) => pointInPolygon(mid, z.points));
+  };
+
   for (let i = 0; i < obstacles.length; i++) {
     for (let j = i + 1; j < obstacles.length; j++) {
       const a = obstacles[i];
@@ -180,6 +191,7 @@ export function analyseCirculation(floor: Floor, minWidth: number, maxGap = 4): 
       // une allee : la diagonale mesuree entre leurs coins n'est pas un passage.
       if (!faceToFace) continue;
       if (!segmentIsClear(from, to, obstacles, a.id, b.id)) continue;
+      if (behindCounter(from, to)) continue;
 
       gaps.push({
         id: `${a.id}~${b.id}`,

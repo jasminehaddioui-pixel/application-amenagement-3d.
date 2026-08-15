@@ -405,7 +405,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 13;
+export const HAGETMAU_REVISION = 15;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
@@ -593,7 +593,7 @@ export function buildHagetmauProject(): Project {
   zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (suite)'));
   // Le linéaire se termine en rayonnage ; l'avant-dernier module habille le
   // poteau P5, coté à 1,85 m de la façade sur 50 cm de large.
-  runY(items, MURAL, XR, 'right', 19.7, 5);
+  runY(items, MURAL, XR, 'right', 19.7, 4);
 
   // --- rive gauche : une gondole continue, du fond de vente jusqu'à la caisse.
   // Le mur de flanc ne commence qu'au droit du mur biais ; au-dessus, la ligne
@@ -622,7 +622,9 @@ export function buildHagetmauProject(): Project {
   // la façade. La file A s'arrête plus tôt pour laisser 1,50 m devant l'îlot.
   const lowTop = 17.75;
   const lowEnd = gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 3);
-  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 2);
+  // La file A s'arrête plus tôt : le comptoir de caisse occupe la fin de sa
+  // travée, et il lui faut 1,50 m de dégagement en amont.
+  gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 1);
   zones.push(zone('promo', RUN_A - 0.5, lowTop, RUN_B - RUN_A + 1, lowEnd - lowTop, 'Gondoles basses'));
   zones.push(
     zone('circulation', SHOP_L, highEnd, XR - SHOP_L, lowTop - highEnd, 'Allée transversale'),
@@ -631,26 +633,36 @@ export function buildHagetmauProject(): Project {
   // ---------------------------------------------------------- avant-magasin
   // L'îlot fruits et légumes est posé au centre, dans l'axe de l'entrée : c'est
   // le premier univers rencontré, et on en fait le tour.
-  const ilotX = 12.3;
-  const ilotY = 23.9;
+  // --- le poste de caisse, monté en comptoir
+  // La caisse est parallèle à la travée d'alcools et décalée devant elle. Entre
+  // les deux, 90 cm : c'est la place de l'hôte de caisse, qui travaille dos aux
+  // bouteilles. Le client ne peut pas les atteindre — il n'y accède qu'en
+  // passant derrière le comptoir.
+  const POSTE_D = 0.9; // dégagement de service derrière la caisse
+  const caisseX = SHOP_L + MURAL_D + POSTE_D + CAISSE.d / 2;
+  const caisseY = 23.5;
+  items.push(put(CAISSE, caisseX, caisseY, 90));
+  // La zone « caisse » délimite le poste de travail : tout ce qui est mesuré à
+  // l'intérieur relève du service, pas de la circulation client.
+  zones.push(
+    zone('caisse', SHOP_L, caisseY - CAISSE.w / 2 - 0.4, caisseX + CAISSE.d / 2 - SHOP_L, CAISSE.w + 0.8),
+  );
+
+  // L'îlot fruits et légumes se décale à droite de l'entrée : le comptoir
+  // occupe désormais toute la largeur de gauche.
+  const ilotX = 14.4;
+  const ilotY = YF - 0.15 - ILOT_FL.d / 2;
   items.push(put(ILOT_FL, ilotX, ilotY, 0));
   zones.push(zone('fruits', ilotX - 1.3, ilotY - 0.8, 2.6, 1.6));
 
-  // Caisse bi-optique posée EN TRAVERS, devant la travée d'alcools forts : elle
-  // en barre l'accès. L'hôte de caisse a les bouteilles dans le dos, le client
-  // ne peut les atteindre qu'en passant le poste. Le passage entre la caisse et
-  // l'îlot fait 1,50 m.
-  items.push(put(CAISSE, SHOP_L + CAISSE.w / 2, 25.15, 0));
-  zones.push(zone('caisse', SHOP_L, 24.5, 2.0, 1.5));
-
-  // La presse occupe l'angle avant droit, devant la vitrine.
-  items.push(put(PRESSE, XR - 0.6, YF - 0.3 - PRESSE.d / 2, 0));
+  // La presse remonte contre le mur droit, où elle habille le poteau P5.
+  items.push(put(PRESSE, XR - PRESSE.d / 2, 24.4, 90));
 
   items.push(
-    put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 13.9, YF - 0.3, 0),
+    put({ catalogId: 'panier', name: 'Paniers', w: 0.45, d: 0.35, h: 0.9 }, 11.1, 23.9, 0),
   );
   items.push(
-    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 9.9, 23.4, 0),
+    put({ catalogId: 'chariot', name: 'Chariots', w: 0.6, d: 1.0, h: 1.0 }, 12.0, 23.2, 0),
   );
   zones.push(zone('entree', entranceX - 0.9, YF - 2.2, 1.8, 2.2));
 

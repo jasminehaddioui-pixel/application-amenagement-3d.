@@ -149,6 +149,9 @@ et affichée en permanence.
   droite.
 - Les mesures ignorent les passages qui traverseraient un autre meuble, afin de ne
   retenir que les circulations réelles.
+- Le dégagement derrière un comptoir de caisse est la place de travail de l'hôte de
+  caisse, pas une allée client : les mesures dont le milieu tombe dans une zone
+  « caisse » sont écartées.
 
 ### 8. Propriétés
 
@@ -238,7 +241,8 @@ la ligne visible à cet endroit sur le relevé est une ligne de cote, pas un mur
 | Fond de la vente | **4,00 ml de lockers Amazon** côté gauche, un passage de service de 1,97 m, puis une gondole double face adossée au mur droit : c'est le mobilier qui ferme la vente, il n'y a pas de cloison |
 | Surface de vente exploitée | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
 | Rive gauche | **une gondole continue** du fond de vente jusqu'à la caisse : 5 modules simple face à dos plein là où il n'y a pas de mur, puis 8 muraux, le départ à fond perforé, et 2 modules d'alcools forts |
-| Avant-magasin | **caisse posée en travers, devant la travée d'alcools forts** : elle en barre l'accès, l'hôte de caisse a les bouteilles dans le dos et le client ne peut les atteindre qu'en passant le poste. Passage de 1,50 m entre la caisse et l'îlot. **Îlot fruits et légumes au centre**, dégagé de 1,59 m des gondoles basses. Presse en façade à droite, devant la vitrine |
+| Poste de caisse | monté **en comptoir** : la caisse est parallèle à la travée d'alcools forts et décalée de 90 cm devant elle. L'hôte de caisse travaille dans cet intervalle, dos aux bouteilles ; le client ne peut les atteindre qu'en passant derrière le comptoir. Les 90 cm sont un dégagement de service, pas une allée : le contrôle de circulation les écarte |
+| Avant-magasin | **îlot fruits et légumes à droite de l'entrée**, le comptoir occupant toute la largeur de gauche. Presse contre le mur droit, où elle habille le poteau P5 |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
 | Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente exploitée, 68 m² de vente encore libre, 39,7 m² de réserve |
 
@@ -293,7 +297,7 @@ meuble frigorifique.
 | Gondole alcools forts | 2 modules | — | poste nouveau |
 | Modules centraux h. 2200 | 9 (8 en files + 1 au fond) | 8 | +1 |
 | Têtes de gondole h. 2200 | 5 | 4 | +1 |
-| Modules h. 1500 | 5 (2 en file A, 3 en file B) | 5 | conforme |
+| Modules h. 1500 | 4 (1 en file A, 3 en file B) | 5 | −1 : le comptoir occupe la fin de la travée A |
 | Lockers Amazon | 4,00 ml | — | selon la consigne |
 | Froid positif | **4 meubles de 2 portes** (EIS 112 HP), soit 8 portes | 10 portes en 12 modèles panachés | parc homogène, 2 portes de moins |
 | Froid négatif | **3 meubles de 2 portes** (Multifreeze 2P), soit 6 portes | 6 portes en 2 meubles de 3 portes | même nombre de portes, meubles plus petits |
