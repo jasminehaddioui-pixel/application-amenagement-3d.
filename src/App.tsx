@@ -8,11 +8,21 @@ import ScaleDialog from './ui/ScaleDialog';
 import AutoLayoutDialog from './ui/AutoLayoutDialog';
 import Canvas2D from './editor2d/Canvas2D';
 import Scene3D, { download3DImage } from './view3d/Scene3D';
+import Gestion from './gestion/ui/Gestion';
 import { exportPlanPDF, exportPlanPNG, printPlan } from './lib/exporters';
 import { exportProjectFile, saveProject } from './state/projects';
 import { useIsMobile } from './ui/useMediaQuery';
 
 const AUTOSAVE_DELAY = 4000;
+
+/** Les deux metiers de l'application : amenager le local, puis le gerer. */
+type Module = 'plan' | 'gestion';
+
+const MODULE_KEY = 'planstore.module';
+
+function initialModule(): Module {
+  return localStorage.getItem(MODULE_KEY) === 'gestion' ? 'gestion' : 'plan';
+}
 
 export default function App() {
   const project = useEditor((s) => s.project);
@@ -26,6 +36,7 @@ export default function App() {
   const store = useEditor;
 
   const isMobile = useIsMobile();
+  const [module, setModuleState] = useState<Module>(initialModule);
   const [showProjects, setShowProjects] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [leftOpen, setLeftOpen] = useState(false);
@@ -111,6 +122,13 @@ export default function App() {
     setRightOpen(false);
   };
 
+  // Le module choisi est retenu : on retrouve son poste de travail au rechargement.
+  const setModule = (m: Module) => {
+    setModuleState(m);
+    localStorage.setItem(MODULE_KEY, m);
+    closeDrawers();
+  };
+
   const runExport = async (name: string, fn: () => Promise<void> | void) => {
     setBusy(name);
     setShowMenu(false);
@@ -158,35 +176,52 @@ export default function App() {
     <div className={appClass}>
       <header className="topbar">
         {isMobile ? (
-          <button
-            type="button"
-            className="btn icon"
-            title="Bibliothèque et réglages"
-            onClick={() => {
-              setRightOpen(false);
-              setLeftOpen((v) => !v);
-            }}
-          >
-            ☰
-          </button>
+          module === 'plan' && (
+            <button
+              type="button"
+              className="btn icon"
+              title="Bibliothèque et réglages"
+              onClick={() => {
+                setRightOpen(false);
+                setLeftOpen((v) => !v);
+              }}
+            >
+              ☰
+            </button>
+          )
         ) : (
           <div className="brand">
             <span className="mark">P</span>
             <span>
               PlanStore
-              <small>Aménagement de locaux commerciaux</small>
+              <small>{module === 'plan' ? 'Aménagement de locaux commerciaux' : 'Gestion de la supérette'}</small>
             </span>
           </div>
         )}
 
-        <input
-          className="project-name"
-          value={project.name}
-          onChange={(e) => store.getState().renameCurrent(e.target.value)}
-          title="Nom du projet"
-        />
+        <div className="seg">
+          <button type="button" className={module === 'plan' ? 'active' : ''} onClick={() => setModule('plan')}>
+            {isMobile ? 'Plan' : 'Aménagement'}
+          </button>
+          <button
+            type="button"
+            className={module === 'gestion' ? 'active' : ''}
+            onClick={() => setModule('gestion')}
+          >
+            Gestion
+          </button>
+        </div>
 
-        {!isMobile && (
+        {module === 'plan' && (
+          <input
+            className="project-name"
+            value={project.name}
+            onChange={(e) => store.getState().renameCurrent(e.target.value)}
+            title="Nom du projet"
+          />
+        )}
+
+        {module === 'plan' && !isMobile && (
           <>
             <button type="button" className="btn" onClick={() => setShowProjects(true)}>
               Projets
@@ -197,6 +232,7 @@ export default function App() {
           </>
         )}
 
+        {module === 'plan' && (
         <div className="menu-anchor" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
@@ -241,10 +277,11 @@ export default function App() {
             </div>
           )}
         </div>
+        )}
 
         <div className="spacer" />
 
-        {!isMobile && (
+        {module === 'plan' && !isMobile && (
           <span className="saved-label">
             {dirty ? (
               <>
@@ -258,22 +295,27 @@ export default function App() {
           </span>
         )}
 
-        <div className="seg">
-          {views
-            .filter(([id]) => !(isMobile && id === 'split'))
-            .map(([id, label, short]) => (
-              <button
-                key={id}
-                type="button"
-                className={view === id ? 'active' : ''}
-                onClick={() => setView(id)}
-              >
-                {isMobile ? short : label}
-              </button>
-            ))}
-        </div>
+        {module === 'plan' && (
+          <div className="seg">
+            {views
+              .filter(([id]) => !(isMobile && id === 'split'))
+              .map(([id, label, short]) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={view === id ? 'active' : ''}
+                  onClick={() => setView(id)}
+                >
+                  {isMobile ? short : label}
+                </button>
+              ))}
+          </div>
+        )}
       </header>
 
+      {module === 'gestion' && <Gestion />}
+
+      {module === 'plan' && (
       <div className="app-body">
         <LeftPanel />
 
@@ -310,8 +352,9 @@ export default function App() {
           </>
         )}
       </div>
+      )}
 
-      {isMobile && (
+      {module === 'plan' && isMobile && (
         <nav className="mobile-bar">
           <button
             type="button"
