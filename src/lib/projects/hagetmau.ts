@@ -79,6 +79,16 @@ const DOUBLE_D_CONST = 1.0;
  * masque la réserve tout en restant du mobilier démontable.
  */
 
+/**
+ * La réserve : la bande du fond, celle qui abrite les groupes. 2,45 m de
+ * profondeur sur toute la largeur, fermée par un mur de refend existant — c'est
+ * le seul local de stockage. Tout ce qui est au sud est de la surface de vente,
+ * aménagée ou non.
+ */
+const BAND_DEPTH = 2.45;
+const BAND_Y = YB + BAND_DEPTH + WALL / 2; // 2,75 — axe du mur de réserve
+const BAND_FACE = BAND_Y + WALL / 2; // 2,85 — nu vente
+
 /** Aile gauche : 8,00 m de large, refendue du magasin. */
 const WING_R = 8.2; // nu droit de l'aile
 const SHOP_L = 8.4; // nu gauche du magasin
@@ -430,11 +440,18 @@ export function buildHagetmauProject(): Project {
   openings.push(vitrine(14.6, 2.8));
 
   // --------------------------------------------------- cloisonnement réel
+  // Le mur de la réserve, en fond de bâtiment, avec deux passages de service :
+  // un côté aile, un côté magasin.
+  const bandWall = wall({ x: XL - h, y: BAND_Y }, { x: XR + h, y: BAND_Y }, 'wall', WALL);
+  walls.push(bandWall);
+  openings.push(door(bandWall.id, 4.0, 1.5));
+  openings.push(door(bandWall.id, 12.0, 1.5));
+
   // Le refend qui sépare l'aile gauche du magasin, sur toute la hauteur du
   // bâtiment jusqu'à l'angle du mur biais.
-  const wingWall = wall({ x: WING_R + h, y: YB - h }, { x: WING_R + h, y: WING_END }, 'wall', WALL);
+  const wingWall = wall({ x: WING_R + h, y: BAND_Y }, { x: WING_R + h, y: WING_END }, 'wall', WALL);
   walls.push(wingWall);
-  openings.push(door(wingWall.id, 3.4, 1.5)); // liaison aile / réserve du magasin
+  openings.push(door(wingWall.id, 2.0, 1.5)); // liaison aile / magasin
 
   // Les deux bureaux. Ce sont les seuls locaux cloisonnés qui subsistent :
   // le tirage montre leur mur haut et leur mur droit, le DTA les nomme.
@@ -464,18 +481,21 @@ export function buildHagetmauProject(): Project {
   });
   for (let i = 0; i < 3; i++) columns.push(buttress(2.88 + i * 3.08));
 
-  // Volumes libres de l'aile, de part et d'autre des bureaux.
-  zones.push(zone('reserve', XL, YB, WING_R - XL, OFF_TOP - h - YB, 'Réserve — aile'));
+  // Hors bureaux, l'aile est de la surface de vente : elle n'est simplement pas
+  // encore aménagée. Elle n'est pas comptée dans la surface de vente exploitée.
+  zones.push(zone('autre', XL, BAND_FACE, WING_R - XL, OFF_TOP - h - BAND_FACE, 'Vente non aménagée — aile'));
   zones.push(
-    zone('circulation', OFF_R + h, OFF_TOP - h, WING_R - OFF_R - h, WING_END - h - OFF_TOP + h, 'Dégagement'),
+    zone('autre', OFF_R + h, OFF_TOP - h, WING_R - OFF_R - h, WING_END - OFF_TOP + h, 'Vente non aménagée — aile'),
   );
   zones.push(zone('autre', XL, OFF_TOP + h, OFF_R - h - XL, OFF_MID - PART / 2 - OFF_TOP - h, 'Bureau 1'));
   zones.push(zone('autre', XL, OFF_MID + PART / 2, OFF_R - h - XL, OFF_BOTTOM - OFF_MID - PART / 2, 'Bureau 2'));
 
-  // ------------------------------------------------------ réserve du magasin
-  // Aucune cloison : la réserve occupe tout le fond du magasin et n'est fermée
-  // que par la file de gondoles posée en travers, plus bas.
-  zones.push(zone('reserve', SHOP_L, YB, XR - SHOP_L, DIVIDER_Y - YB, 'Réserve magasin'));
+  // ----------------------------------------------- fond du magasin, non aménagé
+  // Entre la réserve et la file de gondoles, c'est encore de la surface de
+  // vente : elle sert de zone de travail en attendant d'être exploitée.
+  zones.push(
+    zone('autre', SHOP_L, BAND_FACE, XR - SHOP_L, DIVIDER_Y - BAND_FACE, 'Vente non aménagée — magasin'),
+  );
 
   // ------------------------------------------------- poteaux relevés au plan
   const col = (x: number, y: number, w: number, d: number, name: string) => ({
@@ -498,12 +518,12 @@ export function buildHagetmauProject(): Project {
   columns.push(col(XR - 0.1, fromFront(1.85), 0.2, 0.5, 'Poteau P5 — 1,85 m, contre mur droit (50 × 20)'));
   columns.push(col(XR - 0.35, fromFront(10.0), 0.7, 1.1, 'Gaine technique — 10,00 m, 110 × 70'));
 
-  // --------------------------------------------------- rayonnage de réserve
-  // Racks le long des murs, à l'écart des contreforts.
-  runY(items, RACK, XR, 'right', YB + 0.15, 2);
-  runX(items, RACK, YB, 'top', SHOP_L + 0.2, 1);
-  runX(items, RACK, YB, 'top', XL + 0.2, 2);
-  runY(items, RACK, WING_R, 'right', OFF_TOP + 0.5, 2);
+  // ------------------------------------------------------------- la réserve
+  // C'est la bande du fond, celle qui abrite les groupes : 2,45 m de profondeur
+  // sur toute la largeur du bâtiment, fermée par un mur de refend existant.
+  zones.push(zone('reserve', XL, YB, XR - XL, BAND_Y - h - YB, 'Réserve'));
+  // Racks lourds adossés au mur du fond, allée de service de 1,35 m devant.
+  runX(items, RACK, YB, 'top', XL + 0.1, 5);
 
   // -------------------------------------------------------- surface de vente
   zones.push(zone('vente', SHOP_L, SALES_TOP, XR - SHOP_L, YF - SALES_TOP));
