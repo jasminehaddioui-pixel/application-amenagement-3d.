@@ -69,6 +69,28 @@ export default function Canvas2D() {
     return () => ro.disconnect();
   }, []);
 
+  // ------------------------------------------------------- cadrage a l'ouverture
+  // Sans cela, on arrive sur la position de camera par defaut : sur un grand
+  // local, et surtout sur un ecran de telephone, elle tombe dans un coin vide et
+  // on croit que le plan n'existe pas. On cadre donc sur le contenu des qu'on
+  // connait la taille du canevas, et a chaque changement de projet.
+  // Le cadrage est refait tant que la taille du canevas bouge — au premier
+  // rendu elle n'est pas encore connue — mais on s'arrete des que l'utilisateur
+  // a lui-meme deplace ou zoome la vue.
+  const fitRef = useRef<{ id: string; x: number; y: number; zoom: number } | null>(null);
+  useEffect(() => {
+    if (size.width < 2 || size.height < 2) return;
+    const cam = store.getState().camera;
+    const done = fitRef.current;
+    if (done && done.id === project.id) {
+      const untouched = done.x === cam.x && done.y === cam.y && done.zoom === cam.zoom;
+      if (!untouched) return;
+    }
+    store.getState().zoomToFit(size);
+    const next = store.getState().camera;
+    fitRef.current = { id: project.id, x: next.x, y: next.y, zoom: next.zoom };
+  }, [project.id, size, store]);
+
   const toWorld = useCallback(
     (e: { clientX: number; clientY: number }): Vec2 => {
       const rect = canvasRef.current?.getBoundingClientRect();

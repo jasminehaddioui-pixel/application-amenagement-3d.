@@ -423,7 +423,7 @@ export const HAGETMAU_NAME = 'Panier Sympa — Hagetmau';
  * resservir indéfiniment l'ancien plan, quelle que soit la mise en ligne.
  * L'ancienne copie n'est pas effacée : elle reste dans la liste des projets.
  */
-export const HAGETMAU_REVISION = 9;
+export const HAGETMAU_REVISION = 10;
 
 /** Identifiant du projet de référence, porteur de sa révision. */
 export const HAGETMAU_ID = `hagetmau-r${HAGETMAU_REVISION}`;
