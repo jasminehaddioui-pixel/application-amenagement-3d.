@@ -63,45 +63,34 @@ const XL = WALL; //  0,20 — mur gauche
 const XR = 16.4; // 16,40 — mur droit
 const YB = WALL; //  0,20 — mur du fond
 
-/** Bandeau de locaux du fond (chaîne de cotes du mur gauche : 2,45 puis 23). */
-const BAND_DEPTH = 2.45;
-const BAND_Y = YB + BAND_DEPTH; // 2,65 — nu du bandeau
-const BACK_FACE = BAND_Y + WALL; // 2,85 — nu sud du mur du bandeau
-
-/** Refends du bandeau, chaîne de cotes du mur du fond. */
-const ROOMS: Array<[number, number, string, ZoneCategory]> = [
-  [0.2, 3.2, 'Groupes froids', 'autre'],
-  [3.55, 5.0, 'Sanitaires', 'hygiene'],
-  [5.35, 8.5, 'C.F. Crèmerie', 'frais'],
-  [8.75, 11.9, 'C.F. Boucherie', 'frais'],
-  [12.25, 16.4, 'Laboratoire', 'autre'],
-];
-
-/** Profondeur hors tout d'un mural simple face (devis RAY-ORG). */
+/** Profondeurs hors tout du mobilier de rayonnage (devis RAY-ORG). */
 const MURAL_D_CONST = 0.55;
+const DOUBLE_D_CONST = 1.0;
+
+/**
+ * ÉTAT RÉEL DU LOCAL
+ * Les locaux dessinés sur le tirage — groupes, chambres froides, laboratoire —
+ * appartenaient à l'aménagement précédent : ils ont été déposés. Il ne reste que
+ * la coque, le refend qui sépare l'aile gauche du magasin, et les deux bureaux
+ * de l'aile. Tout le reste est un volume libre.
+ *
+ * Il n'y a donc AUCUNE cloison entre l'arrière et la surface de vente : la
+ * limite est faite par une file de gondoles double face posée en travers, qui
+ * masque la réserve tout en restant du mobilier démontable.
+ */
 
 /** Aile gauche : 8,00 m de large, refendue du magasin. */
 const WING_R = 8.2; // nu droit de l'aile
 const SHOP_L = 8.4; // nu gauche du magasin
-const WING_ROOM_R = 5.55; // cloison des réserves de l'aile
-const WING_MID = 5.5; // refend horizontal entre les deux réserves
-const WING_END = 12.0; // fond du dégagement, avant le mur biais
+const WING_END = 13.1; // le refend rejoint l'angle du mur biais
 
-/** Magasin : 8,00 × 23,20 (relevé). */
-const YF = BACK_FACE + 23.2; // 26,05 — façade sur rue
+/** Les deux bureaux, seuls locaux cloisonnés (relevé et DTA). */
+const OFF_R = 5.6; // axe de leur cloison droite
+const OFF_TOP = 5.45; // axe de leur cloison haute
+const OFF_MID = 8.6; // axe du refend Bureau 1 / Bureau 2
+const OFF_BOTTOM = 11.75; // fin du bloc bureaux
 
-/**
- * Le relevé posait le refend à 16,00 m de la façade. Les arrières sont
- * largement dimensionnés — bandeau de locaux, deux réserves dans l'aile, trois
- * remises — et la réserve du magasin n'a pas besoin de 7,00 m de profondeur.
- * On la ramène à 4,00 m et on rend les 3,00 m à la vente : les allées y gagnent
- * en longueur, et l'avant-magasin la place de manœuvre exigée pour un fauteuil.
- * Les poteaux P2 et P4, qui portaient l'ancien refend, restent en place et sont
- * habillés par le mobilier.
- */
-const RESERVE_DEPTH = 4.0;
-const PART_Y = BACK_FACE + RESERVE_DEPTH - WALL / 2; // 6,95 — axe du refend
-const SALES_TOP = PART_Y + WALL / 2; // 7,05 — nu vente du refend
+const YF = 26.05; // façade sur rue
 
 const EXT_W = XR + WALL; // 16,60 hors œuvre
 const EXT_L = YF + WALL; // 26,25 hors œuvre
@@ -122,6 +111,13 @@ const fromFront = (d: number) => YF - d;
 const PMR_AISLE = 1.5;
 const PMR_MAIN_AISLE = 1.8;
 
+/**
+ * Face arrière de la file de gondoles qui tient lieu de séparation, et face
+ * vente de cette même file. La réserve occupe tout ce qui est au-dessus.
+ */
+const DIVIDER_Y = 7.05;
+const SALES_TOP = DIVIDER_Y + DOUBLE_D_CONST;
+
 // Files de gondoles centrales. Les axes sont calés sur les meubles les plus
 // profonds de chaque rive : muraux de 550 à gauche, froid de 786 à droite. Tout
 // le froid positif est donc regroupé sur la rive droite, ce qui rend 23 cm à
@@ -136,7 +132,7 @@ const MODULE = 1.0; // module de gondole (devis RAY-ORG)
 // Le long de la file, une tête de gondole occupe sa LARGEUR (1,03 ml au devis).
 const TG_LEN = 1.03;
 const MURAL_D = MURAL_D_CONST;
-const DOUBLE_D = 1.0; // profondeur hors tout d'une gondole double face
+const DOUBLE_D = DOUBLE_D_CONST;
 
 // ---------------------------------------------------------------- fabriques
 
@@ -374,36 +370,6 @@ const RACK: Spec = {
   h: 2.5,
 };
 
-const CF_RACK: Spec = {
-  catalogId: 'etagere',
-  name: 'Rayonnage inox chambre froide',
-  reference: 'Plan du local — C.F. existante',
-  w: 1.2,
-  d: 0.5,
-  h: 1.8,
-  color: '#9fb6c4',
-  shelves: 4,
-};
-
-const PLAN_TRAVAIL: Spec = {
-  catalogId: 'comptoir',
-  name: 'Plan de travail inox',
-  reference: 'Plan du local — LABO',
-  w: 2.0,
-  d: 0.7,
-  h: 0.9,
-  color: '#93a3ad',
-};
-
-const GROUPE: Spec = {
-  catalogId: 'locker',
-  name: 'Groupe frigorifique',
-  reference: 'Plan du local — local GROUPES',
-  w: 1.2,
-  d: 0.8,
-  h: 1.8,
-  color: '#6b7b88',
-};
 
 // ------------------------------------------------------------------- montage
 
@@ -463,31 +429,26 @@ export function buildHagetmauProject(): Project {
   });
   openings.push(vitrine(14.6, 2.8));
 
-  // ------------------------------------------------- bandeau de locaux du fond
-  const bandWall = wall({ x: XL, y: BAND_Y + h }, { x: XR, y: BAND_Y + h }, 'wall', WALL);
-  walls.push(bandWall);
-  for (const [x0, x1, name, cat] of ROOMS) {
-    zones.push(zone(cat, x0, YB, x1 - x0, BAND_DEPTH, name));
-    // Refend gauche du local (sauf pour le premier, adossé au mur pignon).
-    if (x0 > XL) walls.push(wall({ x: x0 - 0.15, y: YB }, { x: x0 - 0.15, y: BAND_Y }, 'partition', 0.3));
-    openings.push(door(bandWall.id, (x0 + x1) / 2 - XL, name.startsWith('C.F.') ? 1.2 : 0.9));
-  }
-
-  // ------------------------------------------------------------- aile gauche
-  // Refend aile / magasin. Il rejoint l'angle du mur biais : au-delà, la même
-  // ligne devient le flanc extérieur du magasin.
-  const wingWall = wall({ x: WING_R + h, y: BACK_FACE }, { x: WING_R + h, y: WING_END + 1.1 }, 'wall', WALL);
+  // --------------------------------------------------- cloisonnement réel
+  // Le refend qui sépare l'aile gauche du magasin, sur toute la hauteur du
+  // bâtiment jusqu'à l'angle du mur biais.
+  const wingWall = wall({ x: WING_R + h, y: YB - h }, { x: WING_R + h, y: WING_END }, 'wall', WALL);
   walls.push(wingWall);
-  openings.push(door(wingWall.id, 1.4, 1.5)); // liaison aile / réserve du magasin
+  openings.push(door(wingWall.id, 3.4, 1.5)); // liaison aile / réserve du magasin
 
-  const wingSplit = wall({ x: WING_ROOM_R, y: BACK_FACE }, { x: WING_ROOM_R, y: WING_END }, 'partition', PART);
-  walls.push(wingSplit);
-  const wingMid = wall({ x: XL, y: WING_MID }, { x: WING_ROOM_R, y: WING_MID }, 'partition', PART);
-  walls.push(wingMid);
-  openings.push(door(wingSplit.id, 1.3, 1.0));
-  openings.push(door(wingSplit.id, 6.0, 1.0));
+  // Les deux bureaux. Ce sont les seuls locaux cloisonnés qui subsistent :
+  // le tirage montre leur mur haut et leur mur droit, le DTA les nomme.
+  const offTop = wall({ x: XL - h, y: OFF_TOP }, { x: OFF_R, y: OFF_TOP }, 'wall', WALL);
+  walls.push(offTop);
+  const offRight = wall({ x: OFF_R, y: OFF_TOP }, { x: OFF_R, y: OFF_BOTTOM }, 'wall', WALL);
+  walls.push(offRight);
+  const offMid = wall({ x: XL - h, y: OFF_MID }, { x: OFF_R, y: OFF_MID }, 'partition', PART);
+  walls.push(offMid);
+  openings.push(door(offRight.id, 1.6, 0.9)); // Bureau 1
+  openings.push(door(offRight.id, 4.7, 0.9)); // Bureau 2
 
-  // Contreforts du mur gauche : trois travées de 2,70 séparées par 38 cm.
+  // Contreforts du mur gauche : trois travées de 2,70 séparées par 38 cm
+  // (chaîne de cotes du tirage). Ils sont pris dans les murs des bureaux.
   const buttress = (y: number) => ({
     id: uid('c'),
     kind: 'column' as const,
@@ -499,20 +460,22 @@ export function buildHagetmauProject(): Project {
     height: 3,
     rotation: 0,
     existing: true,
-    name: `Contrefort — travée de 2,70 m`,
+    name: 'Contrefort — travée de 2,70 m',
   });
-  for (let i = 0; i < 3; i++) columns.push(buttress(BACK_FACE + 2.7 + i * 3.08));
+  for (let i = 0; i < 3; i++) columns.push(buttress(2.88 + i * 3.08));
 
-  zones.push(zone('reserve', XL, BACK_FACE, WING_ROOM_R - PART / 2 - XL, WING_MID - PART / 2 - BACK_FACE, 'Réserve 1'));
-  zones.push(zone('reserve', XL, WING_MID + PART / 2, WING_ROOM_R - PART / 2 - XL, WING_END - WING_MID - PART / 2, 'Réserve 2'));
-  zones.push(zone('circulation', WING_ROOM_R + PART / 2, BACK_FACE, WING_R - WING_ROOM_R - PART / 2, WING_END - BACK_FACE, 'Dégagement'));
+  // Volumes libres de l'aile, de part et d'autre des bureaux.
+  zones.push(zone('reserve', XL, YB, WING_R - XL, OFF_TOP - h - YB, 'Réserve — aile'));
+  zones.push(
+    zone('circulation', OFF_R + h, OFF_TOP - h, WING_R - OFF_R - h, WING_END - h - OFF_TOP + h, 'Dégagement'),
+  );
+  zones.push(zone('autre', XL, OFF_TOP + h, OFF_R - h - XL, OFF_MID - PART / 2 - OFF_TOP - h, 'Bureau 1'));
+  zones.push(zone('autre', XL, OFF_MID + PART / 2, OFF_R - h - XL, OFF_BOTTOM - OFF_MID - PART / 2, 'Bureau 2'));
 
   // ------------------------------------------------------ réserve du magasin
-  const partition = wall({ x: SHOP_L, y: PART_Y }, { x: XR, y: PART_Y }, 'wall', WALL);
-  walls.push(partition);
-  const serviceDoorX = 9.75; // porte de service de 1,50 m (relevé)
-  openings.push(door(partition.id, serviceDoorX - SHOP_L, 1.5));
-  zones.push(zone('reserve', SHOP_L, BACK_FACE, XR - SHOP_L, PART_Y - h - BACK_FACE, 'Réserve magasin'));
+  // Aucune cloison : la réserve occupe tout le fond du magasin et n'est fermée
+  // que par la file de gondoles posée en travers, plus bas.
+  zones.push(zone('reserve', SHOP_L, YB, XR - SHOP_L, DIVIDER_Y - YB, 'Réserve magasin'));
 
   // ------------------------------------------------- poteaux relevés au plan
   const col = (x: number, y: number, w: number, d: number, name: string) => ({
@@ -535,102 +498,104 @@ export function buildHagetmauProject(): Project {
   columns.push(col(XR - 0.1, fromFront(1.85), 0.2, 0.5, 'Poteau P5 — 1,85 m, contre mur droit (50 × 20)'));
   columns.push(col(XR - 0.35, fromFront(10.0), 0.7, 1.1, 'Gaine technique — 10,00 m, 110 × 70'));
 
-  // ------------------------------------------------- mobilier des arrières
-  // Groupes froids, laboratoire, chambres froides : le local est équipé.
-  items.push(put(GROUPE, 1.0, YB + 0.5, 0));
-  items.push(put(GROUPE, 2.4, YB + 0.5, 0));
-  items.push(put(PLAN_TRAVAIL, 13.4, YB + 0.4, 0));
-  for (const [x0, , name] of ROOMS) {
-    if (!name.startsWith('C.F.')) continue;
-    runX(items, CF_RACK, YB, 'top', x0 + 0.15, 2);
-  }
-  // Racks. Dans l'aile, ils restent à l'écart des contreforts du mur gauche :
-  // à plat au fond de la Réserve 1, le long de la cloison dans la Réserve 2.
-  items.push(put(RACK, XL + 0.1 + RACK.w / 2, BACK_FACE + 0.1 + RACK.d / 2, 0));
-  const wingRackX = WING_ROOM_R - PART / 2 - RACK.d / 2;
-  items.push(put(RACK, wingRackX, WING_MID + PART / 2 + 0.15 + RACK.w / 2, 90));
-  items.push(put(RACK, wingRackX, WING_MID + PART / 2 + 0.25 + RACK.w * 1.5, 90));
-  items.push(put(RACK, XL + 0.1 + RACK.w / 2, 6.15 + RACK.d / 2, 0));
-  items.push(put(RACK, XR - RACK.d / 2, BACK_FACE + 0.15 + RACK.w / 2, 90));
-  items.push(put(RACK, SHOP_L + 0.15 + RACK.w / 2, PART_Y - h - 0.15 - RACK.d / 2, 0));
+  // --------------------------------------------------- rayonnage de réserve
+  // Racks le long des murs, à l'écart des contreforts.
+  runY(items, RACK, XR, 'right', YB + 0.15, 2);
+  runX(items, RACK, YB, 'top', SHOP_L + 0.2, 1);
+  runX(items, RACK, YB, 'top', XL + 0.2, 2);
+  runY(items, RACK, WING_R, 'right', OFF_TOP + 0.5, 2);
 
   // -------------------------------------------------------- surface de vente
   zones.push(zone('vente', SHOP_L, SALES_TOP, XR - SHOP_L, YF - SALES_TOP));
 
-  // --- fond de vente : porte de service, lockers Amazon, muraux. Le bandeau
-  // démarre après le linéaire du mur gauche, qui occupe l'angle.
-  runX(items, LOCKER, SALES_TOP, 'top', 10.6, 2);
-  runX(items, MURAL, SALES_TOP, 'top', 12.7, 3);
+  /** Pose une travée : tête de gondole, modules, tête de gondole. */
+  const gondolaRun = (
+    axis: number,
+    top: number,
+    mod: Spec,
+    tg: Spec,
+    count: number,
+    along: 'y' | 'x' = 'y',
+  ): number => {
+    const rot = along === 'y' ? 90 : 0;
+    const place = (spec: Spec, at: number) =>
+      items.push(along === 'y' ? put(spec, axis, at, rot) : put(spec, at, axis, rot));
+    let c = top;
+    place(tg, c + TG_LEN / 2);
+    c += TG_LEN;
+    for (let i = 0; i < count; i++) {
+      place(mod, c + MODULE / 2);
+      c += MODULE;
+    }
+    place(tg, c + TG_LEN / 2);
+    return c + TG_LEN;
+  };
+
+  // --- LA SÉPARATION EST UNE FILE DE GONDOLES, PAS UNE CLOISON
+  // Le local n'a aucun refend entre l'arrière et la vente. La limite est faite
+  // par une travée double face posée en travers, adossée au mur droit, qui
+  // masque la réserve. Elle laisse à gauche un passage de service de 1,94 m.
+  const dividerAxis = DIVIDER_Y + DOUBLE_D / 2;
+  const dividerStart = XR - (2 * TG_LEN + 4 * MODULE);
+  gondolaRun(dividerAxis, dividerStart, GONDOLE_H, TG_H, 4, 'x');
+  zones.push(
+    zone('circulation', SHOP_L, DIVIDER_Y, dividerStart - SHOP_L, DOUBLE_D, 'Passage de service'),
+  );
 
   // --- mur droit : tout le froid positif y est regroupé, ce qui libère la rive
   // gauche et élargit les trois allées. La gaine technique reste contournée.
-  const surgTop = SALES_TOP + 0.65;
+  const surgTop = SALES_TOP + 0.1;
   let y = runY(items, MULTIFREEZE, XR, 'right', surgTop, 2); // 6 portes surgelés
   zones.push(zone('surgeles', XR - 0.9, surgTop, 0.9, y - surgTop));
   const gaineTop = fromFront(10.0) - 0.55; // 15,50
   const frais1 = y + 0.1;
   y = runY(items, EIS_162, XR, 'right', frais1, 1); // repère 1A
-  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B
   zones.push(zone('frais', XR - 0.9, frais1, 0.9, y - frais1));
   const frais2 = gaineTop + 1.1 + 0.1; // reprise après la gaine
   y = runY(items, EIS_162, XR, 'right', frais2, 1); // repère 1A (2e meuble)
+  y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 1B
   y = runY(items, EIS_112, XR, 'right', y + 0.1, 1); // repère 2
-  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 2)'));
-  // Le dernier module de la file habille le poteau P5, coté à 1,85 m de la
+  zones.push(zone('frais', XR - 0.9, frais2, 0.9, y - frais2, 'Frais (rep. 1A / 1B / 2)'));
+  // Le deuxième module de la file habille le poteau P5, coté à 1,85 m de la
   // façade sur 50 cm de large.
-  runY(items, MURAL, XR, 'right', 20.45, 4);
+  runY(items, MURAL, XR, 'right', 21.7, 3);
 
   // --- mur gauche : une seule file de muraux, ininterrompue. Elle habille au
   // passage les poteaux P2 (16,00 m) et P1 (13,31 m), tous deux contre le mur.
-  // Le départ est calé à 35 cm du refend pour qu'un module entier vienne
-  // coiffer le poteau P2 plutôt que de tomber à cheval dessus.
-  let yl = runY(items, MURAL, SHOP_L, 'left', SALES_TOP + 0.35, 9);
+  // Le départ est calé pour qu'un module entier vienne coiffer P2 plutôt que de
+  // tomber à cheval dessus.
+  let yl = runY(items, MURAL, SHOP_L, 'left', 8.2, 9);
   yl = runY(items, MURAL_PERF, SHOP_L, 'left', yl + 0.1, 1); // pâtisserie
+  yl = runY(items, LOCKER, SHOP_L, 'left', yl + 0.1, 2);
+  // La presse termine le linéaire, face à l'entrée.
+  items.push(put(PRESSE, SHOP_L + PRESSE.d / 2, yl + 0.1 + PRESSE.w / 2, 90));
 
   // --- gondoles centrales
-  /** Pose une travée : tête de gondole, modules, tête de gondole. */
-  const gondolaRun = (axis: number, top: number, mod: Spec, tg: Spec, count: number): number => {
-    let cy = top;
-    items.push(put(tg, axis, cy + TG_LEN / 2, 90));
-    cy += TG_LEN;
-    for (let i = 0; i < count; i++) {
-      items.push(put(mod, axis, cy + MODULE / 2, 90));
-      cy += MODULE;
-    }
-    items.push(put(tg, axis, cy + TG_LEN / 2, 90));
-    return cy + TG_LEN;
-  };
-
-  // Allée de tête de 1,80 m derrière les lockers, puis les deux travées hautes
-  // du devis : 2 files de 4 modules et 4 têtes. La tête de la file B habille le
-  // poteau P4, resté en place après le recul du refend.
-  const highTop = SALES_TOP + LOCKER.d + PMR_MAIN_AISLE;
+  // Allée de tête de 1,80 m devant la file de séparation, puis les deux travées
+  // hautes : 2 files de 4 modules et 4 têtes. La tête de la file B habille le
+  // poteau P4, resté seul au milieu de la vente.
+  const highTop = SALES_TOP + PMR_MAIN_AISLE;
   const highEnd = gondolaRun(RUN_A, highTop, GONDOLE_H, TG_H, 4);
   gondolaRun(RUN_B, highTop, GONDOLE_H, TG_H, 4);
   zones.push(zone('epicerie', RUN_A - 0.5, highTop, RUN_B - RUN_A + 1, highEnd - highTop));
-  zones.push(
-    zone('circulation', SHOP_L, SALES_TOP + LOCKER.d, XR - SHOP_L, PMR_MAIN_AISLE, 'Allée de tête'),
-  );
+  zones.push(zone('circulation', SHOP_L, SALES_TOP, XR - SHOP_L, PMR_MAIN_AISLE, 'Allée de tête'));
 
-  // Allée transversale de 1,80 m, puis les travées basses côté façade. Le
-  // deuxième module de la file A tombe sur le poteau P3 et l'habille.
-  const lowTop = highEnd + PMR_MAIN_AISLE;
+  // Allée transversale, puis les travées basses côté façade. Le deuxième module
+  // de la file A tombe sur le poteau P3 et l'habille.
+  const lowTop = 17.75;
   const lowEnd = gondolaRun(RUN_A, lowTop, GONDOLE_B, TG_B, 3);
   gondolaRun(RUN_B, lowTop, GONDOLE_B, TG_B, 2);
   zones.push(zone('promo', RUN_A - 0.5, lowTop, RUN_B - RUN_A + 1, lowEnd - lowTop, 'Gondoles basses'));
-  zones.push(zone('circulation', SHOP_L, highEnd, XR - SHOP_L, PMR_MAIN_AISLE, 'Allée transversale'));
+  zones.push(
+    zone('circulation', SHOP_L, highEnd, XR - SHOP_L, lowTop - highEnd, 'Allée transversale'),
+  );
 
   // ---------------------------------------------------------- avant-magasin
-  // La presse prend la fin du linéaire gauche, en retrait des gondoles.
-  items.push(put(PRESSE, SHOP_L + PRESSE.d / 2, yl + 0.1 + PRESSE.w / 2, 90));
-
-  // L'îlot fruits et légumes est le premier univers rencontré en entrant. Il
-  // reste à 20 cm de la façade et laisse plus de 3,50 m de dégagement derrière.
+  // L'îlot fruits et légumes est le premier univers rencontré en entrant.
   items.push(put(ILOT_FL, SHOP_L + 0.2 + ILOT_FL.w / 2, YF - 0.2 - ILOT_FL.d / 2, 0));
   zones.push(zone('fruits', SHOP_L, YF - 2.4, 2.6, 2.4));
 
-  // Caisse bi-optique adossée au mur droit, face à la sortie. Le passage entre
-  // la caisse et l'îlot fait 4,40 m : un fauteuil y fait demi-tour sans gêne.
+  // Caisse bi-optique adossée au mur droit, face à la sortie.
   items.push(put(CAISSE, XR - CAISSE.w / 2, YF - 0.2 - CAISSE.d / 2, 0));
   zones.push(zone('caisse', XR - 2.2, YF - 1.7, 2.2, 1.7));
 

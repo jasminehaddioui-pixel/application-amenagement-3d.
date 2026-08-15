@@ -222,15 +222,19 @@ Chaque meuble porte sa **référence de devis**, visible et modifiable dans le p
 de propriétés. Les murs, poteaux et portes sont marqués « existant » et le carrelage
 est conservé : l'aménagement se construit autour.
 
-**La maquette couvre tout le bâtiment**, pas seulement la surface de vente :
+**La maquette couvre tout le bâtiment**, pas seulement la surface de vente.
+Les locaux dessinés sur le tirage — groupes, chambres froides, laboratoire —
+appartenaient à l'aménagement précédent et ont été déposés : il ne reste que la
+coque, le refend entre l'aile gauche et le magasin, et les deux bureaux.
 
 | | |
 |---|---|
-| Bandeau de locaux au fond, 2,45 m de profondeur | Groupes froids, sanitaires, C.F. Crèmerie, C.F. Boucherie, laboratoire |
-| Aile gauche, 8,00 m de large, trois travées de 2,70 m entre contreforts | Réserve 1, Réserve 2, dégagement, fermée au sud par le mur biais |
-| Magasin, 8,00 × 23,20 m | réserve de 4,00 m au fond, puis 19,00 m de vente jusqu'à la façade |
+| Aile gauche, 8,00 m de large, trois travées de 2,70 m entre contreforts | volume libre servant de réserve, **Bureau 1** et **Bureau 2** (les seuls locaux cloisonnés), dégagement, fermée au sud par le mur biais |
+| Arrière du magasin | volume libre de 54,8 m², sans aucune cloison |
+| Séparation vente / réserve | **une file de gondoles double face posée en travers**, adossée au mur droit : c'est le mobilier qui fait la cloison. Elle laisse à gauche un passage de service de 1,94 m |
+| Surface de vente | 18,00 × 8,00 m, deux files de gondoles, froid en périphérie droite, muraux en périphérie gauche |
 | Façade sur rue | devanture vitrée : vitrine fixe, porte vitrée automatique à deux vantaux, vitrine fixe — d'après le BAT Agelia « Panier Sympa de Hagetmau, mise en situation V2 » |
-| Total | 16,20 × 25,85 m dans œuvre, 153,6 m² de vente, 78,4 m² de réserves et de locaux |
+| Total | 16,20 × 25,85 m dans œuvre, 144 m² de vente, 96 m² de réserves et de bureaux |
 
 **Accessibilité PMR** (arrêté du 8 décembre 2014, ERP existants). Le seuil
 réglementaire d'une circulation intérieure est de 1,20 m ; le plan retient **1,50 m**,
@@ -241,30 +245,32 @@ C'est aussi le seuil utilisé par l'analyse de circulation du logiciel.
 |---|---|
 | Allées entre gondoles | **1,55 m** — les trois sont égales |
 | Allée de tête et allée transversale | **1,80 m** |
+| Passage de service vers la réserve | 1,94 m |
 | Porte d'entrée automatique | 1,80 m de passage libre, sans seuil ni battant |
-| Porte de service | 1,50 m |
-| Portes intérieures | 0,90 m, 1,20 m pour les chambres froides |
-| Dégagement devant la caisse | 3,88 m, et 2,68 m entre l'îlot et les gondoles |
+| Portes des bureaux | 0,90 m |
+| Passage le plus étroit du magasin | **1,50 m**, mesuré par le contrôle |
 
 Pour tenir ces largeurs dans 8,00 m de magasin, **tout le froid positif a été
 regroupé sur la rive droite** : la rive gauche ne porte plus que des muraux de 550 mm
 au lieu d'un meuble frigorifique de 786, ce qui rend 23 cm à chacune des trois allées.
-Et parce que les arrières sont largement dimensionnés, **la réserve du magasin passe
-de 7,00 à 4,00 m** : les 3,00 m rendus à la vente donnent à l'avant-magasin la place
-de manœuvre exigée pour un fauteuil, et portent la surface de vente de 128 à 153,6 m².
+Et parce que le fond du bâtiment est un grand volume libre, la surface de vente
+occupe 18,00 m sur les 25,85 m du magasin : l'avant-magasin dispose de la place de
+manœuvre exigée pour un fauteuil, et la vente atteint 144 m².
 
 **Traitement des poteaux.** Les poteaux ne coupent plus le linéaire : quand un poteau
 tombe dans l'emprise d'un meuble, le meuble est posé de façon à l'englober — c'est
 l'habillage de poteau, pratique courante en agencement. P1, P2 et P5 sont habillés par
-un mural, P4 par une tête de gondole, P3 par un module de gondole basse. Seule la
-gaine technique (110 × 70) reste contournée : on ne coffre pas une gaine dans un
-meuble frigorifique.
+un mural, P4 par une tête de gondole, P3 par un module de gondole basse — cinq des six
+éléments de structure. Seule la gaine technique (110 × 70) reste contournée : on ne
+coffre pas une gaine dans un meuble frigorifique.
 
-**Ce qui est posé.** 16 modules de muraux plus le départ à fond perforé, soit 17,00 ml
-contre 17,12 ml au devis ; les 8 modules centraux h. 2200 et leurs 4 têtes, en deux
-files de 4 ; 5 modules h. 1500 et 4 têtes en travée basse ; 10 portes de froid positif
-et 6 de négatif, conformément au dossier EPTA — le plan d'implantation en annonçait
-12 + 6, c'est le dossier EPTA, plus récent, qui a été suivi.
+**Ce qui est posé, et l'écart au devis.** 12 modules de muraux plus le départ à fond
+perforé, soit 13,00 ml contre 17,12 ml chiffrés : 4 ml de moins. En revanche la file
+qui sert de séparation demande **4 modules double face h. 2200 et 2 têtes de plus** que
+les 8 modules et 4 têtes du devis, puisqu'elle remplace une cloison qui n'existe pas.
+Le reste suit le devis : 5 modules h. 1500 et 4 têtes en travée basse, 10 portes de
+froid positif et 6 de négatif conformément au dossier EPTA — le plan d'implantation en
+annonçait 12 + 6, c'est le dossier EPTA, plus récent, qui a été suivi.
 
 **Contrôle mécanique.** `npm run verifier:hagetmau` reconstruit le bâtiment et vérifie
 qu'aucun meuble ne chevauche un autre meuble ou la coque, que chaque ouverture tient
