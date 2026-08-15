@@ -146,3 +146,4 @@ vite.config.ts.timestamp-*
 # aux .ts et servirait du code perime.
 /src/**/*.js
 /vite.config.js
+dist-fichier-unique

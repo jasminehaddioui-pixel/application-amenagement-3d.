@@ -10,6 +10,7 @@
     "typecheck": "tsc -b",
     "preview": "vite preview",
     "verifier:implantation": "esbuild scripts/verifier-implantation.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/verifier-implantation.mjs && node node_modules/.cache/verifier-implantation.mjs",
+    "fichier-unique": "node scripts/exporter-fichier-unique.mjs",
     "verifier:hagetmau": "esbuild scripts/verifier-hagetmau.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/verifier-hagetmau.mjs && node node_modules/.cache/verifier-hagetmau.mjs"
   },
   "dependencies": {

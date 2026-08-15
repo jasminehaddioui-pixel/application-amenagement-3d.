@@ -20,6 +20,8 @@ npm run preview    # sert le build de production sur http://localhost:4173
 
 npm run verifier:implantation   # contrôle du générateur automatique
 npm run verifier:hagetmau       # contrôle géométrique du magasin de référence
+
+npm run build && npm run fichier-unique   # application en un seul fichier HTML
 ```
 
 Prérequis : Node.js 18 ou supérieur. Le navigateur doit supporter WebGL pour la vue 3D.
@@ -42,6 +44,21 @@ navigateur de la personne qui l'utilise.
 Alternative si le dépôt doit rester privé : Netlify ou Vercel acceptent les dépôts
 privés sur leur offre gratuite. Il suffit d'y connecter le dépôt avec la commande de
 build `npm run build` et le dossier de publication `dist`.
+
+### Version en un seul fichier
+
+`npm run fichier-unique` produit `dist-fichier-unique/PlanStore-Hagetmau.html` :
+l'application entière — code, styles, plan de référence — dans un fichier de 1,5 Mo
+qui s'ouvre par simple double-clic, ou depuis une pièce jointe sur un téléphone.
+Aucun serveur, aucun réseau. C'est la porte de sortie quand l'hébergement n'est pas
+joignable — connexion filtrée, réseau d'entreprise, déplacement — et un moyen simple
+d'archiver une version du plan.
+
+Le plan, la vue 3D, les cotations et l'analyse des circulations y fonctionnent
+normalement. Seuls l'import d'un plan PDF et les exports PDF / image restent
+indisponibles : ils reposent sur des morceaux de code chargés à la demande, qu'un
+fichier isolé ne peut pas aller chercher. L'application le dit clairement si on
+essaie, au lieu d'échouer en silence.
 
 ---
 
